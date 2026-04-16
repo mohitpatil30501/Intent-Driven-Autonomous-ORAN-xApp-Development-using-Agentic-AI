@@ -1,0 +1,78 @@
+openapi: 3.0.1
+info:
+  title: O1 Notifications
+  version: 17.00.00
+  description: >-
+    OAS 3.0.1 definition of the O1 Notifications
+    
+    Copyright 2025 O-RAN ALLIANCE e.V.
+    Licensed under the Standards Collaboration
+    Copyright License Version 1.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+    https://www.o-ran.org/sccl
+externalDocs:
+  description: O-RAN O1 Interface Specification
+  url: https://specifications.o-ran.org/
+servers:
+  - url: '{notificationRecipientAddress}'
+    variables:
+      notificationRecipientAddress:
+        description: Address on the O1 (MnS) consumer side defined by NtfSubscriptionControl.notificationRecipientAddress. See 3GPP TS 28.622 clause 4.3.22
+        default: http://exampleConsumer.com/notificationReceiver
+paths:
+  /:
+    post:
+      summary: Receive one of a set of O1 related notifications
+      description: >-
+        The O1 producer sends a notification to the O1 consumer. 
+        This interface shall be implemented by the notification-receiver and 
+        used by the notification-sender.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: 'O1_RegistrationNotification.yaml#/components/schemas/NotifyO1Registration'
+      responses:
+        '204':
+          description: >-
+            Success case ("204 No Content").
+            The notification is successfully delivered. The response message
+            body is absent.
+        default:
+          description: Error case.
+          content:
+            application/json:
+              schema:
+                $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    NotificationHeader:
+      type: object
+      properties:
+        href:
+          $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/Uri'
+        notificationId:
+          $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/NotificationId'
+        notificationType:
+          $ref: '#/components/schemas/NotificationType'
+        eventTime:
+          $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/DateTime'
+        systemDN:
+          $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/SystemDN'
+      required:
+        - href
+        - notificationId
+        - notificationType
+        - eventTime
+        - systemDN
+    NotificationType:
+      oneOf:
+        - $ref: '#/components/schemas/O1NotificationTypes'
+        - $ref: '//forge.3gpp.org/rep/all/5G_APIs/-/raw/REL-18/TS28623_ComDefs.yaml#/components/schemas/NotificationType'
+    O1NotificationTypes:
+      type: string
+      enum:
+        - notifyO1Registration

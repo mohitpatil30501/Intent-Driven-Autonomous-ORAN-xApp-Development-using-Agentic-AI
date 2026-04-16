@@ -1,0 +1,163 @@
+module o-ran-cti-tn-docsis {
+  yang-version 1.1;
+  namespace "urn:o-ran:cti-tn-docsis:2.0";
+  prefix "or-cti-docsis";
+
+
+  import o-ran-cti-common {
+    prefix or-ctic;
+  }
+
+  import o-ran-cti-tn-generic {
+    prefix or-ctig;
+  }
+
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  import o-ran-common-yang-types {
+    prefix or-types;
+  }
+
+  import o-ran-common-identity-refs {
+    prefix or-refs;
+  }
+
+  organization "O-RAN Alliance";
+
+  contact
+    "www.o-ran.org";
+
+  description
+    "This module defines the configuration of for the CTI transport
+     node that for DOCSIS defined transport nodes that implement the
+     O-RAN WG4 Cooperative transport Interface.
+
+    Copyright 2022 the O-RAN Alliance.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+    GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE)ARISING IN ANY WAY OUT OF THE USE OF
+    THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the above disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the above disclaimer in the documentation
+    and/or other materials provided with the distribution.
+    * Neither the Members of the O-RAN Alliance nor the names of its
+    contributors may be used to endorse or promote products derived from
+    this software without specific prior written permission.";
+
+  revision "2022-04-15" {
+    description
+      "version 3.0.0
+
+      1) non-backward compatible changes to switch to camelCase";
+
+    reference "ORAN-WG4.CTI-TMP.0-v03.00";
+  }
+
+  identity docsis-transport {
+    base "or-refs:o-ran-transport-technology-base";
+    description
+      "an identity corresponding to DOCSIS transport";
+  }
+
+  grouping docsisSessionConfigDataGrp {
+    description
+      "A grouping of DOCSIS specific CTI session info.";
+
+    leaf cmMacAddress {
+      type yang:mac-address;
+      description "a MAC address on the DOCSIS equipment connected to O-RU";
+    }
+  }
+
+  grouping docsisFlowConfigDataGrp {
+    description
+      "A grouping for DOCSIS specific flow in use info";
+
+    leaf associatedScn {
+      type string { length "1..15"; }
+      description
+        "This key indicates the Service Class Name associated with
+        this CTI flow. DOCSIS specifies that the maximum
+        size is 16 ASCII characters including a terminating zero.";
+      reference "Information Model Mapping: CM-SP-CCAP-OSSIv4.0
+        ServiceClass::Name";
+    }
+    choice filterType {
+      description "the filter type";
+      case ethernet {
+        container l2Flow {
+          must "(sourceMac)or(destinationMac)or(ethertype)or(pcp)or(vlanId)";
+          description "the layer 2 flow";
+          uses or-ctic:layer2FilterGrp;
+        }
+      }
+      case udpip {
+        container udpipFlow {
+          must "(sourceAddress)or(sourcePrefix)or(destinationAddress)or(destinationPrefix)"
+          + "or(dscp)or((sourcePortStart)and(sourcePortEnd))or((destinationPortStart)and(destinationPortEnd))"
+          + "or(ipv4Protocol)or(ipv6TrafficClass)or(ipv6Flow)or(ipv6NextHeader)";
+          description "the udpip flow container";
+          uses or-ctic:layer3and4FilterGrp;
+        }
+      }
+    }
+  }
+
+  grouping docsisCtiConnectivityProfileGrp {
+    description
+      "Configuration data for CTI conectivity.";
+
+    container l4CtiIf {
+      description
+        "A container for a l4 cti interface";
+
+      leaf ctiServerIpInterfaceRef {
+        type or-ctic:localIpv4OrIpv6;
+          description "a local IP address on the TN (CMTS) for the CTI Server";
+      }
+
+      leaf vlanId {
+        type or-types:vlan-id;
+        description "an optional vlan id associated with this IP/host CTI connection";
+      }
+    }
+  }
+
+
+  augment "/or-ctig:ctiTn/or-ctig:ctiSession/or-ctig:technologySpecificSessionInfo" {
+    when "(derived-from-or-self(../../transportType,"
+      +  "'docsis-transport'))";
+    description "augmentation for session data";
+    uses docsisSessionConfigDataGrp;
+  }
+
+  augment "/or-ctig:ctiTn/or-ctig:ctiSession/or-ctig:ctiFlows/or-ctig:technologySpecificFlowInfo" {
+    when "(derived-from-or-self(../../../transportType,"
+      + "'docsis-transport'))";
+    description "augmentation for flow data";
+    uses docsisFlowConfigDataGrp;
+  }
+
+  augment "/or-ctig:ctiTn/or-ctig:ctiTnServer/or-ctig:serverClientPair" {
+    when "(derived-from-or-self(../../transportType, 'docsis-transport'))";
+    description "augmentation for cti profile";
+    uses docsisCtiConnectivityProfileGrp;
+  }
+}

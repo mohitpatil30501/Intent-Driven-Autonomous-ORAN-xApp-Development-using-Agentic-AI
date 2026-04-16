@@ -1,0 +1,166 @@
+# yaml-language-server: $schema=../o-ran-test-results-schema.json
+schemaVersion: 1
+testMetadata:
+  startDate: "2025-01-20T15:00:00-05:00"
+  dutName: Test
+  result: PASS
+  testType: conformance
+  interfaceUnderTest:
+    - o-ru.ofh
+    - o-ru.fhm
+  testId: ABCD250001
+  iotProfile:
+    wg4IotSpecificationVersion: "12.01"
+    cusPlaneIotProfileName: NR TDD IOT Profile 1 - NR-TDD-FR1-CAT-A-NoBF
+    cusPlaneIotProfileTestConfiguration: NR-TDD-FR1-CAT-A-NoBF_[ConfigDDDSUUDDDD-4SS-14bitIQ-25Gbpsx1lane-PRACHB4-eAxCID2644-llsC1C2]
+    mPlaneIotProfileName: M-Plane IOT Profile 2 Hybrid-sudo+nms
+    mPlaneIotProfileTestConfiguration: Hybrid-sudo+nms-[o-ran-mplane-int.yang]
+  configurationParameters:
+    frequencyRange5G:
+      - fr1
+    band5G:
+      - n48
+    nr-arfcn: 641668
+    subCarrierSpacing: 30kHz
+    totalTransmissionBandwidth: 100
+    duplexMode: tdd
+testbedComponents:
+  - componentDescription: O-RU
+    manufacturerName: Test RU
+    manufacturerModel: Test RU
+    softwareVersion: test
+    contacts:
+      - firstName: test
+        lastName: test
+        email: test@test.com
+    configurationParameters:
+      numRxAntenna: 4
+      numTxAntenna: 4
+      numMimoLayers: 4
+      ipv4: true
+      ipv6: true
+testLab:
+  name: Test
+  address: test
+  contacts:
+    - firstName: test
+      lastName: test
+      email: test@test.com
+testSpecifications:
+  - name: test
+    description: test
+    version: Test
+    links:
+      - displayName: test
+        url: file://test/text.txt
+        description: More text.
+testResults:
+  - number: "1"
+    name: ungrouped test case
+    description: test case outside of a group
+    status: mandatory
+    result: PASS
+    metrics:
+      - description: metric text
+        status: mandatory
+        result: PASS
+        measurements:
+          - name: measurement1
+            units: bps
+            values:
+              - 1
+    notes:
+      - title: A test note
+        body: The body of the test note with more details.
+  - number: "1"
+    name: first group
+    groupItems:
+      - number: "1.1"
+        name: test case
+        description: test case
+        status: mandatory
+        result: PASS
+        startDate: "2025-01-29T08:00:00-05:00"
+        stopDate: "2025-01-29T17:00:00-05:00"
+        contacts:
+          - firstName: Joe
+            lastName: Tester
+            email: joe@lab.com
+            organization: The Lab
+        artifacts:
+          - name: User Plan Packet Capture
+            description: Packet capture file for user plan traffic to UE 1.
+            path: group-1/test-1-1/ue_user_traffic.pcap
+        metrics:
+          - description: metric text
+            status: conditionally.mandatory
+            result: PASS
+            measurements:
+              - name: measurement1
+                units: bps
+                values:
+                  - 1
+      - number: "2"
+        name: second group
+        description: Group 2 description
+        groupItems:
+          - number: "2.1"
+            name: first subgroup
+            description: Group 2.1 as a sub group
+            groupItems:
+              - number: 2.1.1
+                name: a grouped test case
+                description: test case
+                status: optional
+                result: PASS
+                metrics:
+                  - description: metric text
+                    status: mandatory
+                    result: PASS
+                    measurements:
+                      - name: measurement1
+                        units: bps
+                        values:
+                          - 1
+          - number: "2.2"
+            name: second subgroup
+            description: Group 2.2 as a sub group
+            groupItems:
+              - number: 2.2.1
+                name: first sub subgroup
+                description: Group 2.2.1 as a sub sub group
+                groupItems:
+                  - number: 2.2.1.1
+                    name: WG4 Example Test with results
+                    description: a test case example with more detailed metrics
+                    status: mandatory
+                    result: FAIL
+                    artifacts:
+                      - name: Signal analyzer capture data file
+                        description: Capture file from AMCE Measurement Company SA9001 in binary format.
+                        path: WG4/conf/test-1-2-1/sa-data.bin
+                    metrics:
+                      - description: Test step 3 is performmed successfully.
+                        status: mandatory
+                        result: PASS
+                        measurements:
+                          - name: Procedure step 3 performed successfully.
+                            units: boolean
+                            values:
+                              - true
+                      - description: Each step above is correctly validated
+                        status: mandatory
+                        result: PASS
+                        measurements:
+                          - name: Procedure steps correctly validated
+                            units: boolean
+                            values:
+                              - true
+                      - description: The test frame received by the signal analyzer should be the same as the signal described above and should contain all the same PRB assignments and all the original PN23 data.
+                        status: mandatory
+                        result: FAIL
+                        measurements:
+                          - name: PRB assignments are correct.
+                            units: boolean
+                            values:
+                              - false
