@@ -6,6 +6,7 @@ import time
 import sys
 import base64
 import io
+import re
 from PIL import Image
 from bs4 import BeautifulSoup
 
@@ -98,80 +99,146 @@ Rules:
 # -------------------------------
 # MAIN EXTRACTION
 # -------------------------------
+def is_page_number(text):
+    t = text.strip().lower()
+    t = re.sub(r'[^a-z0-9]', '', t)
+    t = t.replace('page', '')
+    return t.isdigit()
+
 def pdf_to_html_simple(pdf_path, output_path):
     print(f"📄 Opening {pdf_path}...")
     doc = fitz.open(pdf_path)
 
-    # 1. Extract HTML per page
-    html_content = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>PDF Extract</title></head><body>"
+    # Pass 1: Dynamic Margin & Header/Footer Detection
+    print("🔍 Performing Pass 1: Dynamic Margin & Header/Footer Detection...")
+    num_pages = len(doc)
+    text_counts = {}
+    img_counts = {}
+    
+    for page in doc:
+        blocks = page.get_text("dict")["blocks"]
+        rect = page.rect
+        for b in blocks:
+            # Check if block is in the top 15% or bottom 15%
+            is_extremity = b["bbox"][1] < rect.height * 0.15 or b["bbox"][3] > rect.height * 0.85
+            if is_extremity:
+                if b["type"] == 0:  # Text
+                    text = ""
+                    for l in b.get("lines", []):
+                        for s in l.get("spans", []):
+                            text += s.get("text", "")
+                    text = text.strip()
+                    if text and not is_page_number(text):
+                        text_counts[text] = text_counts.get(text, 0) + 1
+                elif b["type"] == 1:  # Image
+                    if "image" in b:
+                        img_hash = hashlib.md5(b["image"]).hexdigest()
+                        img_counts[img_hash] = img_counts.get(img_hash, 0) + 1
+
+    header_footer_texts = {t for t, c in text_counts.items() if c > num_pages * 0.3}
+    header_footer_images = {h for h, c in img_counts.items() if c > num_pages * 0.3}
+
+    # Pass 2: Extraction
+    html_content = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>PDF Extract</title></head><body>\n"
     for page_num, page in enumerate(doc):
         print(f"Extracting page {page_num+1}...")
         
-        # Get raw HTML
-        html_content += page.get_text("html")
-        
-        # Extract tables
+        rect = page.rect
+        blocks = page.get_text("dict")["blocks"]
         tables = page.find_tables()
-        for i, table in enumerate(tables):
-            extracted = table.extract()
-            if extracted:
-                html_content += "<table border='1'>"
-                for row_idx, row in enumerate(extracted):
-                    html_content += "<tr>"
-                    for cell in row:
-                        cell_text = str(cell) if cell is not None else ""
-                        # Replace newlines with breaks
-                        cell_text = cell_text.replace("\n", "<br>")
-                        # Strip None strings or clean up
-                        if cell_text == "None":
-                            cell_text = ""
-                        
-                        if row_idx == 0:
-                            html_content += f"<th>{cell_text}</th>"
-                        else:
-                            html_content += f"<td>{cell_text}</td>"
-                    html_content += "</tr>"
-                html_content += "</table><br>"
+        table_bboxes = [fitz.Rect(t.bbox) for t in tables]
+        
+        valid_blocks = []
+        for b in blocks:
+             is_hf = False
+             
+             # Header/Footer filtering
+             is_extremity = b["bbox"][1] < rect.height * 0.15 or b["bbox"][3] > rect.height * 0.85
+             if is_extremity:
+                  if b["type"] == 0:
+                      text = "".join([s.get("text", "") for l in b.get("lines", []) for s in l.get("spans", [])]).strip()
+                      if text in header_footer_texts or is_page_number(text):
+                          is_hf = True
+                  elif b["type"] == 1:
+                      if "image" in b:
+                          img_hash = hashlib.md5(b["image"]).hexdigest()
+                          if img_hash in header_footer_images:
+                              is_hf = True
+             if is_hf:
+                  continue
+                  
+             # Table text duplication filtering
+             # If a block overlaps with ANY extracted table, we discard it to prevent phantom duplicates!
+             b_rect = fitz.Rect(b["bbox"])
+             is_in_table = False
+             for t_box in table_bboxes:
+                  if b_rect.intersects(t_box):
+                       is_in_table = True
+                       break
+             if is_in_table:
+                  continue
+             
+             valid_blocks.append(b)
 
-    html_content += "</body></html>"
+        page_elements = [] # Items with {'y0': y0, 'html': html_string}
+        
+        for i, b in enumerate(valid_blocks):
+             y0 = b["bbox"][1]
+             if b["type"] == 0:
+                 text_content = ""
+                 for l in b.get("lines", []):
+                     line_text = "".join([s.get("text", "") for s in l.get("spans", [])])
+                     text_content += line_text + "<br>"
+                 page_elements.append({'y0': y0, 'html': f"<p>{text_content}</p>\n"})
+             elif b["type"] == 1:
+                 if "image" in b:
+                     # Gather surrounding context natively from sibling blocks
+                     prev_texts = []
+                     for pb in valid_blocks[max(0, i-5):i]:
+                         if pb["type"] == 0:
+                             prev_texts.append("".join([s.get("text", "") for l in pb.get("lines", []) for s in l.get("spans", [])]).strip())
+                             
+                     next_texts = []
+                     for nb in valid_blocks[i+1:min(len(valid_blocks), i+6)]:
+                         if nb["type"] == 0:
+                             next_texts.append("".join([s.get("text", "") for l in nb.get("lines", []) for s in l.get("spans", [])]).strip())
+                             
+                     context_text = f"... {' '.join(prev_texts)} [IMAGE] {' '.join(next_texts)} ..."
+                     
+                     print(f"🖼️  Processing image...")
+                     b64 = base64.b64encode(b["image"]).decode("utf-8")
+                     ext = b.get("ext", "png")
+                     desc = describe_image_with_ollama(b64, context_text)
+                     page_elements.append({'y0': y0, 'html': f'<img src="data:image/{ext};base64,{b64}" data-description="{desc}" />\n'})
+                     
+        # Process the structured tables
+        for table in tables:
+             extracted = table.extract()
+             if not extracted: continue
+             
+             y0 = table.bbox[1]
+             t_html = "<table border='1'>\n"
+             for row_idx, row in enumerate(extracted):
+                 t_html += "<tr>"
+                 for cell in row:
+                     c_text = str(cell).replace("\n", "<br>") if cell is not None and str(cell) != "None" else ""
+                     if row_idx == 0: t_html += f"<th>{c_text}</th>"
+                     else: t_html += f"<td>{c_text}</td>"
+                 t_html += "</tr>\n"
+             t_html += "</table><br>\n"
+             page_elements.append({'y0': y0, 'html': t_html})
+             
+        # Interleave everything vertically (top-to-bottom on the y-axis)
+        page_elements.sort(key=lambda x: x['y0'])
+        for el in page_elements:
+             html_content += el['html']
 
-    # 2. Parse HTML to modify img tags AND remove styles
-    print("🔍 Parsing HTML and analyzing images...")
-    soup = BeautifulSoup(html_content, "html.parser")
-
-    # Remove all style attributes
-    for tag in soup.find_all(True):
-        if "style" in tag.attrs:
-            del tag.attrs["style"]
-
-    images = soup.find_all("img")
-    
-    for i, img in enumerate(images):
-        print(f"🖼️  Processing image {i+1} / {len(images)}...")
-        src = img.get("src", "")
-        if src.startswith("data:image/"):
-            try:
-                # Extract the base64 part of the URI
-                base64_data = src.split("base64,")[1]
-                
-                # Extract surrounding text context (ongoing chunk)
-                prev_strings = [str(s).strip() for s in img.find_all_previous(string=True, limit=30) if str(s).strip()]
-                next_strings = [str(s).strip() for s in img.find_all_next(string=True, limit=30) if str(s).strip()]
-                
-                context_text = f"... {' '.join(reversed(prev_strings))} [IMAGE] {' '.join(next_strings)} ..."
-                
-                # Get the description from the model
-                description = describe_image_with_ollama(base64_data, context_text)
-                
-                # Add it as a new attribute
-                img["data-description"] = description
-            except IndexError:
-                continue
+    html_content += "</body></html>\n"
 
     # 3. Save modified HTML
     print(f"💾 Saving to {output_path}...")
     with open(output_path, "w", encoding="utf-8") as out:
-        out.write(str(soup))
+        out.write(html_content)
         
     print("✅ Done!")
 
