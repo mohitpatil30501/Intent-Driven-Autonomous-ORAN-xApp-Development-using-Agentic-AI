@@ -1,0 +1,5 @@
+PyMuPDF
+requests
+Pillow
+pytesseract
+beautifulsoup4
