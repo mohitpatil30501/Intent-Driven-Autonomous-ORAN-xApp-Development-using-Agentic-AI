@@ -5,6 +5,8 @@ from langgraph.graph.message import add_messages
 
 # Import the decomposer node from module_1
 from module_1.decomposer import decomposer_node
+from module_2.mapper import module_2_technical_node
+from module_3.synthesizer import module_3_data_node
 
 # Define the State for the LangGraph
 class AgentState(TypedDict):
@@ -40,7 +42,7 @@ def check_confirmation(state: AgentState):
     
     # If the LLM previously marked it complete, and the human says 'confirm'
     if state.get("is_complete", False) and "confirm" in last_msg:
-        return END
+        return "technical_mapper"
         
     return "intent_decomposer"
 
@@ -50,6 +52,8 @@ builder = StateGraph(AgentState)
 # Add Nodes
 builder.add_node("intent_decomposer", decomposer_node)
 builder.add_node("ask_human", ask_human)
+builder.add_node("technical_mapper", module_2_technical_node)
+builder.add_node("data_synthesizer", module_3_data_node)
 
 # Set the entry point
 builder.add_edge(START, "intent_decomposer")
@@ -68,10 +72,13 @@ builder.add_conditional_edges(
     "ask_human",
     check_confirmation,
     {
-        END: END,
+        "technical_mapper": "technical_mapper",
         "intent_decomposer": "intent_decomposer"
     }
 )
+
+builder.add_edge("technical_mapper", "data_synthesizer")
+builder.add_edge("data_synthesizer", END)
 
 # Compile the graph with an interrupt before the ask_human node
 graph = builder.compile(interrupt_before=["ask_human"])
