@@ -1,0 +1,2 @@
+Module 2: Technical Template Completion (The O-RAN Engineer)
+What it does: Uses the Knowledge Graph to translate English metrics ("throughput") into FlexRIC KPMs (dl_aggr_tbs) and finds the allowed Action Space.

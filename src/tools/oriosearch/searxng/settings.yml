@@ -1,0 +1,13 @@
+use_default_settings: true
+
+server:
+  limiter: false
+  secret_key: "orio-search-secret-change-me"
+
+search:
+  formats:
+    - html
+    - json
+
+general:
+  enable_metrics: false

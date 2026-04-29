@@ -1,0 +1,31 @@
+services:
+  chroma-db:
+    image: chromadb/chroma:latest
+    ports:
+      - "7000:8000"
+    volumes:
+      - chroma-data:/chroma/chroma
+    networks:
+      - search-net
+
+  semantic-api:
+    build: .
+    ports:
+      - "7080:8080"
+    depends_on:
+      - chroma-db
+    volumes:
+      - ./repos.yml:/app/repos.yml
+      - repo-data:/app/cloned_repos
+    environment:
+      - CHROMA_HOST=chroma-db
+      - CHROMA_PORT=8000
+    networks:
+      - search-net
+
+volumes:
+  chroma-data:
+  repo-data:
+
+networks:
+  search-net:

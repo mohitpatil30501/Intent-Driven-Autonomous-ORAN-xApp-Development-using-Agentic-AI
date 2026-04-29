@@ -1,0 +1,3 @@
+Module 4: ML Developer (The Data Scientist) [CONDITIONAL]
+What it does: If the template says Supervised_ML or Unsupervised_ML, this module wakes up. It writes a Python script to train an AI model using the Historical Data from Module 3.
+Crucial Instruction for this Agent: You must strictly instruct this agent to save the trained model to the workspace (e.g., joblib.dump(model, 'workspace/model.pkl') or torch.save()). It should NOT write the real-time loop; its only job is to leave a saved model artifact on the hard drive.

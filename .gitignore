@@ -49,5 +49,30 @@ Desktop.ini
 ~*.docx
 ~*.doc
 
-# Node (if applicable)
+# Node / Next.js
 node_modules/
+.next/
+out/
+build/
+.npm/
+
+# Agent Workspace (Ignore generated code, but keep README)
+src/workspace/*
+!src/workspace/README.md
+!src/workspace/.keep
+
+# Repositories & Data
+cloned_repos/
+repo-data/
+
+# Databases & LangGraph/LangSmith Checkpoints
+*.sqlite
+*.sqlite3
+*.db
+.langsmith/
+.langgraph_api/
+.langgraph/
+
+# Vector Database Data
+chroma_data/
+chroma-data/
