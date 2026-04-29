@@ -23,6 +23,11 @@ chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
 collection = chroma_client.get_or_create_collection(name="oran_codebase")
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2") # Fast, runs on CPU easily
 
+def log_progress(msg: str):
+    print(msg, flush=True)
+    with open("/app/ingestion.log", "a") as f:
+        f.write(msg + "\n")
+
 def clone_or_pull_repos():
     if not os.path.exists(REPO_DIR):
         os.makedirs(REPO_DIR)
@@ -33,15 +38,15 @@ def clone_or_pull_repos():
     for repo_conf in config.get("repositories", []):
         target_path = os.path.join(REPO_DIR, repo_conf["name"])
         if os.path.exists(target_path):
-            print(f"Pulling latest for {repo_conf['name']}...")
+            log_progress(f"Pulling latest for {repo_conf['name']}...")
             repo = Repo(target_path)
             repo.remotes.origin.pull()
         else:
-            print(f"Cloning {repo_conf['name']}...")
+            log_progress(f"Cloning {repo_conf['name']}...")
             Repo.clone_from(repo_conf["url"], target_path, branch=repo_conf.get("branch", "master"))
 
 def ingest_code_to_vector_db():
-    print("Chunking and Embedding code... (This may take a few minutes on first run)")
+    log_progress("Chunking code... (Loading files and parsing syntax)")
     # Load C, C++, and Python files
     loader = GenericLoader.from_filesystem(
         REPO_DIR,
@@ -62,9 +67,12 @@ def ingest_code_to_vector_db():
     metadatas = [chunk.metadata for chunk in chunks]
     ids = [f"chunk_{i}" for i in range(len(chunks))]
     
+    total = len(documents)
+    log_progress(f"Total chunks to embed: {total}")
+    
     # Embed and upload (in batches to save memory)
     batch_size = 100
-    for i in range(0, len(documents), batch_size):
+    for i in range(0, total, batch_size):
         batch_docs = documents[i:i+batch_size]
         batch_vecs = embeddings.embed_documents(batch_docs)
         collection.upsert(
@@ -73,19 +81,36 @@ def ingest_code_to_vector_db():
             metadatas=metadatas[i:i+batch_size],
             ids=ids[i:i+batch_size]
         )
-    print("Ingestion Complete!")
+        log_progress(f"Embedded {min(i+batch_size, total)} / {total} chunks...")
+    log_progress("Ingestion Complete!")
 
 is_ready = False
 
 def background_ingestion():
     global is_ready
     try:
+        with open("/app/ingestion.log", "w") as f:
+            f.write("System Startup Initialized...\n")
         clone_or_pull_repos()
         ingest_code_to_vector_db()
     except Exception as e:
-        print(f"Error during ingestion: {e}")
+        log_progress(f"Error during ingestion: {e}")
     finally:
         is_ready = True
+
+@app.get("/status")
+def get_status():
+    """Check the status of the ingestion process."""
+    try:
+        with open("/app/ingestion.log", "r") as f:
+            logs = [line.strip() for line in f.readlines()]
+    except FileNotFoundError:
+        logs = ["Log file not created yet."]
+    
+    return {
+        "is_ready": is_ready,
+        "logs": logs
+    }
 
 # Run clone and ingest on startup in the background
 @app.on_event("startup")

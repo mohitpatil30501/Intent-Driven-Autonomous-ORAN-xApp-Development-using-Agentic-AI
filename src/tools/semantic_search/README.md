@@ -45,17 +45,23 @@ docker-compose up -d --build
 ```
 
 ### What happens during startup?
-1. **Cloning**: The API will read `repos.yml` and run `git clone` (or `git pull` if it already exists) into the `/app/cloned_repos` volume.
-2. **Chunking & Embedding**: It will parse all `.c`, `.h`, `.cpp`, and `.py` files, chunk them, and pass them through a HuggingFace embedding model (`all-MiniLM-L6-v2`).
-3. **Indexing**: Vectors are saved to the ChromaDB container.
+The API server boots **instantly** and runs a background thread to build the AI Knowledge Graph:
+1. **Cloning**: It reads `repos.yml` and clones repositories into the `/app/cloned_repos` volume.
+2. **Chunking & Embedding**: It parses `.c`, `.h`, `.cpp`, and `.py` files, chunks them, and passes them through a local HuggingFace embedding model (`all-MiniLM-L6-v2`).
+3. **Indexing**: Vectors are pushed to the ChromaDB container.
 
-*(⚠️ **Note:** The very first time you run this, it may take 2-5 minutes to download the embedding model, clone the repos, and embed the codebase. Subsequent restarts will be much faster.)*
+*(⚠️ **Note:** The very first time you run this, it may take 10-20 minutes to embed a large C/C++ codebase purely on CPU. During this time, the search endpoints will return a JSON notice asking you to wait.)*
 
-To monitor the ingestion progress, check the logs:
+### 📊 Monitoring Ingestion Progress
+To see exactly how many chunks have been processed, you can hit the status endpoint:
 ```bash
-docker-compose logs -f semantic-api
+curl http://localhost:7080/status
 ```
-Look for the message: `Ingestion Complete!`
+
+If the CPU is too overloaded to respond to the HTTP request, you can instantly read the internal log file directly from the container:
+```bash
+docker exec semantic_search-semantic-api-1 cat /app/ingestion.log
+```
 
 ---
 
