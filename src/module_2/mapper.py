@@ -8,8 +8,6 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 
-RECURSIVE_LIMIT = 50
-
 MODULE_2_SYSTEM_PROMPT = """You are "Module 2: The O-RAN Technical Mapper" in an automated xApp development pipeline.
 You will receive an "Intent_Blueprint" written in plain English by a Business Analyst. 
 
@@ -133,8 +131,7 @@ def get_llm():
 
 def module_2_technical_node(state: dict) -> dict:
     """Module 2: Maps NL intent to exact FlexRIC C-variables using Code Search."""
-    
-    global RECURSIVE_LIMIT
+
     # Isolate the blueprint from state
     intent_blueprint = state.get("blueprint", {})
     
@@ -149,11 +146,11 @@ def module_2_technical_node(state: dict) -> dict:
         prompt=MODULE_2_SYSTEM_PROMPT
     )
     
-    # Run the agent with a strict recursion limit (e.g., max 5 tool calls)
+    # Run the agent with a strict recursion limit
     try:
         result = mapper_agent.invoke(
             {"messages": [HumanMessage(content=prompt_content)]},
-            {"recursion_limit": RECURSIVE_LIMIT}
+            {"recursion_limit": int(os.getenv("RECURSIVE_LIMIT", 20))}
         )
         final_text = result["messages"][-1].content
         

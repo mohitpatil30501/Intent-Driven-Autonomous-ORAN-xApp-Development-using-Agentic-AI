@@ -40,6 +40,7 @@ You MUST output your response in exactly TWO sections:
       "questionsForHuman": ["The exact questions you are asking the user"]
     },
     "xApp_Name": "string (A clean, snake_case name for the project)",
+    "code_language": "string (The programming language to be used for the xApp) [C++, Python3]",
     "objective_Why": "string (Why do we need this? e.g., 'To prevent slice starvation' or 'TBD')",
     "target_Action_What_NL": "string (What action will it take? e.g., 'Modify PRB allocation' or 'TBD')",
     "cycle_Type": "Enum: [Supervised_ML, Unsupervised_ML, Pure_Logic, TBD]",

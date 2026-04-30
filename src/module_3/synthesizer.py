@@ -20,7 +20,7 @@ You must use your provided tools to execute the following steps in order:
 2. WRITE SCRIPT: Write a Python script (e.g., `data/generate_data.py`) using `pandas` and `numpy`.
    - Look at `Technical_Mapping.Telemetry_Variables`. The `C_variable` values MUST be the exact column headers in your generated CSV files.
    - Look at `Intent_Blueprint.data_Requirements` for the math/logic needed to simulate anomalies or traffic spikes.
-3. EXECUTE SCRIPT: Run the script using your terminal_command tool (e.g., `python data/generate_data.py`).
+3. EXECUTE SCRIPT: Run the script using your terminal_command tool (e.g., `python3 data/generate_data.py`).
 4. CROSS-CHECK (MANDATORY): You MUST verify the data. Run a command like `head -n 6 data/streaming_mock_data.csv` to view the headers and the first 5 rows. 
    - Verify that the headers exactly match the required C-struct variables.
    - Verify that the data values make mathematical sense based on the requirements.

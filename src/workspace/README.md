@@ -1,1 +1,1 @@
-Workspace to use by agent
+This workspace dir is empty and the agent can use it to create files and folders.
