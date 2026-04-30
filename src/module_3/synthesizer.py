@@ -63,7 +63,8 @@ def module_3_data_node(state: dict) -> dict:
         f"Here is the complete Blueprint and Technical Mapping:\n"
         f"{json.dumps(blueprint, indent=2)}\n\n"
         f"Create the `data/` directory, write the python script inside it, generate the CSVs, "
-        f"verify the first 5 rows using the terminal, and return the Data_Paths JSON."
+        f"verify the first 5 rows using the terminal, and return the Data_Paths JSON.\n"
+        f"IMPORTANT: Create a `log/` directory in the workspace and save the terminal output of your script execution to `log/module_3_data.log` using your tools."
     )
     
     llm = get_llm()

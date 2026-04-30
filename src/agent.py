@@ -8,6 +8,8 @@ from module_1.decomposer import decomposer_node
 from module_2.mapper import module_2_technical_node
 from module_3.synthesizer import module_3_data_node
 from module_4.ml_dev import module_4_ml_dev_node
+from module_5.core_programmer import module_5_logic_dev_node
+from module_6.integrator import module_6_integrator_node
 
 # Define the State for the LangGraph
 class AgentState(TypedDict):
@@ -54,7 +56,7 @@ def should_run_ml(state: AgentState):
     cycle_type = state.get("blueprint", {}).get("Intent_Blueprint", {}).get("cycle_Type", "Pure_Logic")
     if cycle_type in ["Supervised_ML", "Unsupervised_ML"]:
         return "ml_dev"
-    return END
+    return "logic_dev"
 
 # Initialize the StateGraph
 builder = StateGraph(AgentState)
@@ -65,6 +67,8 @@ builder.add_node("ask_human", ask_human)
 builder.add_node("technical_mapper", module_2_technical_node)
 builder.add_node("data_synthesizer", module_3_data_node)
 builder.add_node("ml_dev", module_4_ml_dev_node)
+builder.add_node("logic_dev", module_5_logic_dev_node)
+builder.add_node("integrator", module_6_integrator_node)
 
 # Set the entry point
 builder.add_edge(START, "intent_decomposer")
@@ -96,11 +100,13 @@ builder.add_conditional_edges(
     should_run_ml,
     {
         "ml_dev": "ml_dev",
-        END: END
+        "logic_dev": "logic_dev"
     }
 )
 
-builder.add_edge("ml_dev", END)
+builder.add_edge("ml_dev", "logic_dev")
+builder.add_edge("logic_dev", "integrator")
+builder.add_edge("integrator", END)
 
 # Compile the graph with an interrupt before the ask_human node
 graph = builder.compile(interrupt_before=["ask_human"])

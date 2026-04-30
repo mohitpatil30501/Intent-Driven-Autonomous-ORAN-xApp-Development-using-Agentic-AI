@@ -59,6 +59,7 @@ build/
 # Agent Workspace (Ignore generated code, but keep README)
 src/workspace/*
 !src/workspace/README.md
+!src/workspace/flexric_template.py
 !src/workspace/.keep
 
 # Repositories & Data

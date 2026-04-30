@@ -62,7 +62,8 @@ def module_4_ml_dev_node(state: dict) -> dict:
         f"Here is the complete Blueprint:\n{json.dumps(blueprint, indent=2)}\n\n"
         f"The training data is located at: `{hist_data}`.\n\n"
         f"Create the `ml/` directory, explore the data, choose an algorithm, train the model, "
-        f"save it, and return the ML_Model_Artifacts JSON."
+        f"save it, and return the ML_Model_Artifacts JSON.\n"
+        f"IMPORTANT: Create a `log/` directory in the workspace and save the terminal output of your script execution to `log/module_4_ml.log` using your tools."
     )
     
     llm = get_llm()
