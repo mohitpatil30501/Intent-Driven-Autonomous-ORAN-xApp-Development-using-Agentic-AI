@@ -7,6 +7,7 @@ from langgraph.graph.message import add_messages
 from module_1.decomposer import decomposer_node
 from module_2.mapper import module_2_technical_node
 from module_3.synthesizer import module_3_data_node
+from module_4.ml_dev import module_4_ml_dev_node
 
 # Define the State for the LangGraph
 class AgentState(TypedDict):
@@ -46,6 +47,15 @@ def check_confirmation(state: AgentState):
         
     return "intent_decomposer"
 
+def should_run_ml(state: AgentState):
+    """
+    Check if the ML node should run based on the cycle_Type.
+    """
+    cycle_type = state.get("blueprint", {}).get("Intent_Blueprint", {}).get("cycle_Type", "Pure_Logic")
+    if cycle_type in ["Supervised_ML", "Unsupervised_ML"]:
+        return "ml_dev"
+    return END
+
 # Initialize the StateGraph
 builder = StateGraph(AgentState)
 
@@ -54,6 +64,7 @@ builder.add_node("intent_decomposer", decomposer_node)
 builder.add_node("ask_human", ask_human)
 builder.add_node("technical_mapper", module_2_technical_node)
 builder.add_node("data_synthesizer", module_3_data_node)
+builder.add_node("ml_dev", module_4_ml_dev_node)
 
 # Set the entry point
 builder.add_edge(START, "intent_decomposer")
@@ -78,7 +89,18 @@ builder.add_conditional_edges(
 )
 
 builder.add_edge("technical_mapper", "data_synthesizer")
-builder.add_edge("data_synthesizer", END)
+
+# After data_synthesizer, check if ML is needed
+builder.add_conditional_edges(
+    "data_synthesizer",
+    should_run_ml,
+    {
+        "ml_dev": "ml_dev",
+        END: END
+    }
+)
+
+builder.add_edge("ml_dev", END)
 
 # Compile the graph with an interrupt before the ask_human node
 graph = builder.compile(interrupt_before=["ask_human"])

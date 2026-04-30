@@ -37,7 +37,8 @@ If it is "Supervised_ML" or "Unsupervised_ML":
 
 --- RESPONSE FORMAT ---
 ONLY after you have successfully verified the first 5 rows, output a final JSON block updating the blueprint with the paths to the generated data.
-
+For verification, use oneliner python script to read csv's first 5 row and its headers.
+ 
 ```json
 {
   "Data_Paths": {
@@ -52,8 +53,6 @@ def get_llm():
     ollama_url = os.getenv("OLLAMA_URL", "http://localhost:11434")
     ollama_model = os.getenv("OLLAMA_MODEL", "llama3.1")
     return ChatOllama(model=ollama_model, base_url=ollama_url)
-
-RECURSION_LIMIT = 8
 
 def module_3_data_node(state: dict) -> dict:
     """Module 3: Synthesizes and verifies CSV mock data."""
@@ -82,7 +81,7 @@ def module_3_data_node(state: dict) -> dict:
         # Plus a few extra steps if it makes a syntax error and needs to retry.
         result = data_agent.invoke(
             {"messages": [HumanMessage(content=prompt_content)]},
-            {"recursion_limit": RECURSION_LIMIT}
+            {"recursion_limit": int(os.getenv("RECURSIVE_LIMIT", 20))}
         )
         final_text = result["messages"][-1].content
         
