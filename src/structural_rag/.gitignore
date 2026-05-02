@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Index / build artifacts
+flexric_index/
+*.faiss
+*.pkl
+*.jsonl
+
+# External dependency
+flexric/
+
+# Env
+venv/
+.env
+
+# OS
+.DS_Store

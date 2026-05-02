@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# FlexRIC Structural RAG — Python dependencies
+# ─────────────────────────────────────────────────────────────────────────────
+# Install CORE first, then choose ONE summarizer group.
+#
+# Quick start (CPU, no API key):
+#   pip install -r requirements.txt
+#   pip install -r requirements-ollama.txt   # + run: ollama pull codellama
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── CORE (required) ──────────────────────────────────────────────────────────
+
+# Embeddings
+sentence-transformers>=2.7.0
+
+# Dense vector index
+faiss-cpu>=1.8.0            # swap for faiss-gpu if you have CUDA
+
+# Lexical index
+rank-bm25>=0.2.2
+
+# Graph store
+networkx>=3.3
+
+# Numerics
+numpy>=1.26
+
+# ── AST PARSING (strongly recommended) ───────────────────────────────────────
+
+tree-sitter>=0.22.0
+tree-sitter-c>=0.21.0
+tree-sitter-python>=0.21.0
+
+# ── CODE EMBEDDING (optional but improves symbol-name retrieval) ──────────────
+
+# Uncomment if you want CodeBERT instead of the sentence-transformer fallback:
+# transformers>=4.40.0
+# torch>=2.2.0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SUMMARIZER GROUPS  (install ONE)
+# ─────────────────────────────────────────────────────────────────────────────
+# See requirements-*.txt files for each backend.
+# Built-in tfidf summarizer needs no extra packages.
