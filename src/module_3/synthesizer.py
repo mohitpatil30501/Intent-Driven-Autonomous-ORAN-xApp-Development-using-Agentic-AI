@@ -2,6 +2,7 @@ import json
 import re
 import os
 import sys
+from typing import Any, Dict
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_ollama import ChatOllama
@@ -20,9 +21,13 @@ You must use your provided tools to execute the following steps in order:
 2. WRITE SCRIPT: Write a Python script (e.g., `data/generate_data.py`) using `pandas` and `numpy`.
    - Look at `Technical_Mapping.Telemetry_Variables`. The `C_variable` values MUST be the exact column headers in your generated CSV files.
    - Look at `Intent_Blueprint.data_Requirements` for the math/logic needed to simulate anomalies or traffic spikes.
+   - If ML is used, the script MUST generate a separate `data/test_data.csv` for model evaluation.
+   - If labels are needed for evaluation, use a column named `label` where 0 means normal/no-action behavior and 1 means anomaly/positive-action behavior.
 3. EXECUTE SCRIPT: Run the script using your terminal_command tool (e.g., `python3 data/generate_data.py`).
-4. CROSS-CHECK (MANDATORY): You MUST verify the data. Run a command like `head -n 6 data/streaming_mock_data.csv` to view the headers and the first 5 rows. 
+4. CROSS-CHECK (MANDATORY): You MUST verify the data. Run commands or Python one-liners to view the headers and first 5 rows for every generated CSV.
    - Verify that the headers exactly match the required C-struct variables.
+   - For ML datasets, verify that `data/test_data.csv` exists and contains representative evaluation rows.
+   - For labeled evaluation, verify that the `label` column contains at least two classes when possible.
    - Verify that the data values make mathematical sense based on the requirements.
    - If the data is wrong, rewrite the script and run it again.
 
@@ -30,10 +35,19 @@ You must use your provided tools to execute the following steps in order:
 Check `Intent_Blueprint.cycle_Type`. 
 If it is "Pure_Logic":
 - Generate ONLY `data/streaming_mock_data.csv` (approx 100-500 rows).
+- Do NOT generate model training or test data. Return null for ML-only paths.
 
 If it is "Supervised_ML" or "Unsupervised_ML":
-- Generate `data/streaming_mock_data.csv` (approx 100-500 rows).
-- AND Generate `data/historical_training_data.csv` (approx 5,000+ rows) based on the `historical_data_description_NL`. Include a 'label' column if Supervised_ML.
+- Generate `data/streaming_mock_data.csv` (100-500 rows, no label column).
+- AND Generate `data/historical_training_data.csv` (EXACTLY 5000 rows) based on the `historical_data_description_NL`. Use numpy to generate all 5000 rows in one vectorized call — do NOT use a Python loop. Include a 'label' column if Supervised_ML. Balance classes: ~50% label=0, ~50% label=1 for Supervised_ML.
+- AND Generate `data/test_data.csv` (EXACTLY 1000 rows) for model evaluation. Include 'label' for Supervised_ML.
+- IMPORTANT: Use numpy vectorized generation (np.random.randint, np.random.uniform, np.where) for ALL rows in a single script — NOT row-by-row loops. The script must complete in under 10 seconds.
+- For Unsupervised_ML anomaly detection: training data may be normal-heavy or unlabeled, but test data SHOULD include a `label` column so Module 4 can compute anomaly F1.
+- For autoencoder-style requirements: generate normal-only historical training data and mixed normal/anomaly test data with `label`.
+- Choose and report one of these `training_data_profile` values:
+  - `supervised_labeled`
+  - `unsupervised_mixed`
+  - `autoencoder_normal_train_anomaly_test`
 
 --- RESPONSE FORMAT ---
 ONLY after you have successfully verified the first 5 rows, output a final JSON block updating the blueprint with the paths to the generated data.
@@ -43,7 +57,10 @@ For verification, use oneliner python script to read csv's first 5 row and its h
 {
   "Data_Paths": {
     "streaming_mock_data_path": "data/streaming_mock_data.csv",
-    "historical_training_data_path": "data/historical_training_data.csv" // or null if Pure_Logic
+    "historical_training_data_path": "data/historical_training_data.csv", // or null if Pure_Logic
+    "test_data_path": "data/test_data.csv", // or null if Pure_Logic
+    "test_label_column": "label", // or null if no labels exist
+    "training_data_profile": "supervised_labeled | unsupervised_mixed | autoencoder_normal_train_anomaly_test | pure_logic"
   }
 }
 ```
@@ -54,6 +71,35 @@ def get_llm():
     ollama_model = os.getenv("OLLAMA_MODEL", "llama3.1")
     return ChatOllama(model=ollama_model, base_url=ollama_url)
 
+def _finalize_data_paths(data_paths: Dict[str, Any], blueprint: Dict[str, Any]) -> Dict[str, Any]:
+    cycle_type = blueprint.get("Intent_Blueprint", {}).get("cycle_Type", "Pure_Logic")
+    data_paths.setdefault("streaming_mock_data_path", "data/streaming_mock_data.csv")
+
+    if cycle_type in ["Supervised_ML", "Unsupervised_ML"]:
+        data_paths.setdefault("historical_training_data_path", "data/historical_training_data.csv")
+        data_paths.setdefault("test_data_path", "data/test_data.csv")
+        data_paths.setdefault("test_label_column", "label")
+        if cycle_type == "Supervised_ML":
+            data_paths.setdefault("training_data_profile", "supervised_labeled")
+        else:
+            data_paths.setdefault("training_data_profile", "unsupervised_mixed")
+    else:
+        data_paths["historical_training_data_path"] = None
+        data_paths["test_data_path"] = None
+        data_paths["test_label_column"] = None
+        data_paths["training_data_profile"] = "pure_logic"
+        # Null out ML acceptance criteria so Modules 5/6 LLMs don't misinterpret
+        # threshold values as instructions to load or evaluate an ML model.
+        intent = blueprint.get("Intent_Blueprint", {})
+        intent["model_acceptance_criteria"] = {
+            "threshold": None,
+            "metric_policy": None,
+            "metric_description_NL": None,
+        }
+        blueprint["Intent_Blueprint"] = intent
+
+    return data_paths
+
 def module_3_data_node(state: dict) -> dict:
     """Module 3: Synthesizes and verifies CSV mock data."""
     
@@ -63,7 +109,8 @@ def module_3_data_node(state: dict) -> dict:
         f"Here is the complete Blueprint and Technical Mapping:\n"
         f"{json.dumps(blueprint, indent=2)}\n\n"
         f"Create the `data/` directory, write the python script inside it, generate the CSVs, "
-        f"verify the first 5 rows using the terminal, and return the Data_Paths JSON.\n"
+        f"verify the first 5 rows and headers for every generated CSV using the terminal, "
+        f"and return the extended Data_Paths JSON.\n"
         f"IMPORTANT: Create a `log/` directory in the workspace and save the terminal output of your script execution to `log/module_3_data.log` using your tools."
     )
     
@@ -95,7 +142,7 @@ def module_3_data_node(state: dict) -> dict:
     json_match = re.search(r'```json\s*(.*?)\s*```', final_text, re.DOTALL)
     if json_match:
         try:
-            data_paths = json.loads(json_match.group(1)).get("Data_Paths", {})
+            data_paths = _finalize_data_paths(json.loads(json_match.group(1)).get("Data_Paths", {}), blueprint)
             blueprint["Data_Paths"] = data_paths
         except json.JSONDecodeError:
             print("Failed to parse JSON from Module 3 output.")
