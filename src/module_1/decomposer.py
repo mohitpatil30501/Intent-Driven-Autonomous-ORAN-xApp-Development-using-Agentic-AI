@@ -22,8 +22,11 @@ To build this application, you MUST know all of the following:
 3. WHY it is doing this (the objective/goal).
 4. THE CYCLE TYPE (Pure_Logic, Supervised_ML, or Unsupervised_ML).
 5. THE DATA BEHAVIOR (If ML is used, what should the historical training data look like? What anomalies or patterns should we simulate?).
+6. THE MODEL ACCEPTANCE CRITERIA (ONLY if ML is used). If the human does not specify a threshold, use threshold 0.85 and metric_policy "task_aware". For Pure_Logic, ALL three model_acceptance_criteria fields MUST be set to null.
 
-If the user's request is missing ANY of these, set "isComplete" to false, list the missing fields, and politely ask the user targeted questions to fill in the blanks. DO NOT GUESS.
+If the user's request is missing any required intent, action, objective, cycle type, telemetry, or data behavior details, set "isComplete" to false, list the missing fields, and politely ask the user targeted questions to fill in the blanks. DO NOT GUESS.
+For ML acceptance criteria only, do NOT block completion when the human has not specified a threshold; apply the default threshold 0.85 and metric_policy "task_aware".
+IMPORTANT: If cycle_Type is Pure_Logic, set threshold, metric_policy, and metric_description_NL all to null. Do NOT output numeric threshold values for Pure_Logic xApps.
 
 --- RESPONSE FORMAT ---
 You MUST output your response in exactly TWO sections:
@@ -51,6 +54,11 @@ You MUST output your response in exactly TWO sections:
       "needs_historical_training_data": false,
       "historical_data_description_NL": "string (If ML is chosen, describe what the training data should look like, e.g., 'Needs 10,000 rows showing normal traffic and network congestion spikes' or null)",
       "streaming_mock_data_description_NL": "string (Describe what the real-time data stream should look like to trigger the logic/model)"
+    },
+    "model_acceptance_criteria": {
+      "threshold": "number (ONLY for Supervised_ML or Unsupervised_ML. Set to null for Pure_Logic.)",
+      "metric_policy": "string (ONLY for Supervised_ML or Unsupervised_ML. Set to null for Pure_Logic.)",
+      "metric_description_NL": "string (ONLY for ML types. For Pure_Logic, this MUST be null.)"
     }
   }
 }
