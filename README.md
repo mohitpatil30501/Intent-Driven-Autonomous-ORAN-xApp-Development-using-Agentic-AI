@@ -664,7 +664,7 @@ The graph is configured through `src/langgraph.json`:
 | Variable | Default | Description |
 |---|---|---|
 | `OLLAMA_URL` | `http://localhost:11434` | LLM inference endpoint |
-| `OLLAMA_MODEL` | `llama3.1` | Model name |
+| `OLLAMA_MODEL` | `GPT-OSS-120B` | Model name |
 | `STRUCTURAL_RAG_URL` | `http://localhost:7070` | FlexRIC Structural RAG API (Modules 2, 6, 3b) |
 | `ORIOSEARCH_URL` | `http://localhost:8000` | Web search API (Module 2 fallback) |
 
