@@ -122,6 +122,8 @@ def startup_event():
 class QueryReq(BaseModel):
     query: str
     n_results: int = 5
+    truncate_chars: int = 800
+    return_full_text: bool = False
 
 @app.post("/semantic_search")
 def semantic_search(req: QueryReq):
@@ -135,7 +137,10 @@ def semantic_search(req: QueryReq):
     formatted = []
     for doc, meta in zip(results['documents'][0], results['metadatas'][0]):
         source = meta.get('source', 'Unknown File')
-        formatted.append(f"--- File: {source} ---\n{doc}\n")
+        content = doc
+        if not req.return_full_text and req.truncate_chars > 0 and len(content) > req.truncate_chars:
+            content = content[:req.truncate_chars] + "\n... [TRUNCATED to save tokens. Set return_full_text=True for full code]"
+        formatted.append(f"--- File: {source} ---\n{content}\n")
     return {"results": "\n".join(formatted)}
 
 @app.post("/exact_search")

@@ -14,7 +14,8 @@ semantic_search/
 ├── Dockerfile
 ├── requirements.txt
 ├── repos.yml
-└── app.py
+├── app.py
+└── semantic_search_tool.py  # Python wrapper for agents
 ```
 
 ---
@@ -71,9 +72,15 @@ The API runs on `http://localhost:7080`. You can test it from your terminal:
 
 **1. Semantic Search** (Finds code based on meaning/intent)
 ```bash
+# Default: returns truncated snippets (800 chars) to save tokens
 curl -X POST "http://localhost:7080/semantic_search" \
      -H "Content-Type: application/json" \
      -d '{"query": "how is slice throughput calculated", "n_results": 3}'
+
+# Detailed: returns full code bodies
+curl -X POST "http://localhost:7080/semantic_search" \
+     -H "Content-Type: application/json" \
+     -d '{"query": "how is slice throughput calculated", "return_full_text": true}'
 ```
 
 **2. Exact Keyword Search** (Extremely fast regex/keyword match via `ripgrep`)
@@ -87,47 +94,24 @@ curl -X POST "http://localhost:7080/exact_search" \
 
 ## 🤖 5. LangGraph Agent Integration
 
-To connect **Module 2 (Technical Template Completion)** to this engine, remove your old Sourcegraph and GitLab tools. Add these two tools to your Python agent script:
+Use the `semantic_search_tool.py` wrapper to provide two levels of search to your agent. This manages token usage by separating broad exploration from detailed analysis.
+
+### Usage in Agent Modules
 
 ```python
-import requests
-from langchain_core.tools import tool
+from tools.semantic_search.semantic_search_tool import (
+    semantic_search_summary,   # Use for broad intent lookup (truncated)
+    semantic_search_detailed,  # Use ONLY for deep dive into specific functions (full text)
+)
 
-SEARCH_ENGINE_URL = "http://localhost:7080" # Update if running on a different IP
-
-@tool
-def semantic_code_search(nl_query: str, max_results: int = 3) -> str:
-    """
-    Use this to find code based on intent or concepts. 
-    Example: 'Where are MAC Service Model variables defined?'
-    """
-    try:
-        res = requests.post(
-            f"{SEARCH_ENGINE_URL}/semantic_search", 
-            json={"query": nl_query, "n_results": max_results}
-        )
-        return res.json().get("results", "No results found.")
-    except Exception as e:
-        return f"Error connecting to search engine: {e}"
-
-@tool
-def exact_keyword_search(keyword: str, max_results: int = 5) -> str:
-    """
-    Use this to find EXACT references to a specific C-struct, variable, or function name.
-    Example: 'dl_aggr_tbs' or 'mac_ind_data'
-    """
-    try:
-        res = requests.post(
-            f"{SEARCH_ENGINE_URL}/exact_search", 
-            json={"query": keyword, "n_results": max_results}
-        )
-        return res.json().get("results", "No matches found.")
-    except Exception as e:
-        return f"Error connecting to search engine: {e}"
-
-# Add them to your tool list for Module 2
-tools = [semantic_code_search, exact_keyword_search, ...]
+# Add to your tool list alongside Structural RAG
+tools = [flexric_rag_context, semantic_search_summary, semantic_search_detailed, ...]
 ```
+
+### Why two tools?
+
+- **Summary Tool**: Limits every result to 800 characters. This is the "safest" way to search without hitting context window limits (prevents 3M+ token spikes).
+- **Detailed Tool**: Returns the entire function body. Agents are instructed to use this only after finding a relevant filename via the summary tool or structural RAG.
 
 ---
 

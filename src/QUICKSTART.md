@@ -74,10 +74,10 @@ docker compose up -d
 
 ### FlexRIC Structural RAG (pre-built index — port 7070)
 
-The index is already built at `src/structural_rag/flexric_index/`. Start the FastAPI server:
+The index is already built at `src/tools/structural_rag/flexric_index/`. Start the FastAPI server:
 
 ```bash
-cd src/structural_rag
+cd src/tools/structural_rag
 FLEXRIC_INDEX_DIR=./flexric_index/index \
 uvicorn server:app --host 0.0.0.0 --port 7070
 ```
@@ -269,7 +269,7 @@ curl http://localhost:7070/health
 If it is not running, start it:
 
 ```bash
-cd src/structural_rag
+cd src/tools/structural_rag
 FLEXRIC_INDEX_DIR=./flexric_index/index \
 uvicorn server:app --host 0.0.0.0 --port 7070
 ```
@@ -277,7 +277,7 @@ uvicorn server:app --host 0.0.0.0 --port 7070
 If the index directory is missing, rebuild it (takes a few minutes):
 
 ```bash
-cd src/structural_rag
+cd src/tools/structural_rag
 python pipeline.py build \
     --repo ./flexric \
     --out  ./flexric_index \

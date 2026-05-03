@@ -15,6 +15,10 @@ from tools.structural_rag.flexric_rag_tool import (
     flexric_rag_retrieve,
     exact_keyword_search,   # backward-compat alias for profiler.py
 )
+from tools.semantic_search.semantic_search_tool import (
+    semantic_search_summary,
+    semantic_search_detailed,
+)
 
 MODULE_2_SYSTEM_PROMPT = """You are "Module 2: The O-RAN Technical Mapper" in an automated xApp development pipeline.
 Your ONLY job is to map the "requested_Telemetry_NL" and "target_Action_What_NL" into EXACT FlexRIC Service Models and C-struct variables.
@@ -41,6 +45,7 @@ CALL 2 — Control actions:
   Read the returned context to find the control struct fields and action types for the requested action.
 
 After these 2 calls you have enough information to write the JSON. Do NOT make additional search calls.
+If structural_rag returns insufficient context, you may use `semantic_search_summary` for a broad semantic lookup, and `semantic_search_detailed` ONLY if you need to see the full code body of a specific function.
 
 --- RESPONSE FORMAT ---
 Output a strict JSON code block:
@@ -105,7 +110,7 @@ def restricted_domain_search(query: str, domain: str = "o-ran-sc.org") -> str:
         return f"Error connecting to oriosearch: {e}"
 
 
-tools = [flexric_rag_context, flexric_rag_retrieve, restricted_domain_search]
+tools = [flexric_rag_context, flexric_rag_retrieve, semantic_search_summary, semantic_search_detailed, restricted_domain_search]
 
 
 def get_llm():

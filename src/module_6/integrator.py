@@ -9,6 +9,10 @@ from langchain_ollama import ChatOllama
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
 from tools.structural_rag.flexric_rag_tool import flexric_rag_context
+from tools.semantic_search.semantic_search_tool import (
+    semantic_search_summary,
+    semantic_search_detailed,
+)
 
 MODULE_6_SYSTEM_PROMPT = """You are "Module 6: The xApp Integrator" in an automated O-RAN development pipeline.
 Your ONLY job is to inject the standalone logic created by Module 5 into a deployable FlexRIC xApp.
@@ -42,7 +46,7 @@ STEP 1 — RAG LOOKUP:
   Call `flexric_rag_context(query="<SM> SM indication callback struct fields xApp example", sm_type="<MAC|KPM|RLC|RC>")`.
   Read the returned signatures directly from the response text.
   Do NOT call read_file on any path mentioned in the search result — those paths are inside
-  the search index and are NOT accessible from the workspace filesystem.
+  If flexric_rag_context does not return enough information, you may use `semantic_search_summary` to explore, or `semantic_search_detailed` to see the full code. Use detailed search ONLY when necessary to avoid token limit issues.
 
 STEP 2 — READ TEMPLATE:
   Call `read_file` with filename `flexric_template.py`.
@@ -121,7 +125,7 @@ def module_6_integrator_node(state: dict) -> dict:
     )
 
     llm = get_llm()
-    module_6_tools = workspace_tools + [flexric_rag_context]
+    module_6_tools = workspace_tools + [flexric_rag_context, semantic_search_summary, semantic_search_detailed]
 
     integrator_agent = create_react_agent(
         model=llm,

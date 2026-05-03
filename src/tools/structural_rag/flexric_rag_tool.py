@@ -1,12 +1,8 @@
 """
 LangChain tool wrappers for the FlexRIC Structural RAG API.
 
-The server (src/structural_rag/server.py) must be running before these tools
+The server (src/tools/structural_rag/server/server.py) must be running before these tools
 are used.  Default port: 7070 (set STRUCTURAL_RAG_URL to override).
-
-Start command (from src/structural_rag/):
-    FLEXRIC_INDEX_DIR=./flexric_index/index \
-    uvicorn server:app --host 0.0.0.0 --port 7070
 """
 
 import os

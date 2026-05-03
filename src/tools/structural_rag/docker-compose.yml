@@ -1,0 +1,10 @@
+services:
+  structural_rag:
+    build: .
+    ports:
+      - "7070:7070"
+    volumes:
+      - ./flexric_index:/app/flexric_index
+    environment:
+      - FLEXRIC_INDEX_DIR=/app/flexric_index/index
+    restart: unless-stopped
