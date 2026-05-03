@@ -24,7 +24,7 @@ You must use your tools to execute the following steps in order:
 1. CREATE DIRECTORY: Create a folder named `logic/` inside the workspace.
 2. WRITE SCRIPT: Write `logic/core_logic.py`. This script MUST contain:
    - A class named `XAppLogic`.
-   - An `__init__(self)` method. (If `ML_Model_Artifacts` exists in the blueprint, load the `.pkl` model here).
+   - An `__init__(self)` method. ONLY load a `.pkl` model file if `ML_Model_Artifacts` explicitly exists in the blueprint. If `cycle_Type` is `Pure_Logic` or `ML_Model_Artifacts` is absent, the `__init__` must be empty (no model loading, no sklearn imports). IGNORE any `model_acceptance_criteria` field — it is irrelevant for Pure_Logic.
    - A method `process_interval(self, row_dict)` that takes a dictionary (representing one timestep of KPM data).
    - `process_interval` MUST return a dictionary matching an action from the `Action_Space_Menu` (e.g., `{"action_id": "UPDATE_SLICE_PRB", "parameters": {"slice_id": 1, "prb_ratio": 80}}`).
    
@@ -79,7 +79,7 @@ def module_5_logic_dev_node(state: dict) -> dict:
     
     try:
         # Recursion limit of 10-20 to allow for coding and debugging
-        recursion_limit = int(os.getenv("RECURSIVE_LIMIT", 20))
+        recursion_limit = int(os.getenv("LOGIC_RECURSIVE_LIMIT", max(40, int(os.getenv("RECURSIVE_LIMIT", 20)))))
         result = logic_agent.invoke(
             {"messages": [HumanMessage(content=prompt_content)]},
             {"recursion_limit": recursion_limit}
