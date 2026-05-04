@@ -29,7 +29,7 @@ services:
             dockerfile: Dockerfile.xapp
         container_name: xapp
         environment:
-            - XAPP_DURATION=20 # 20s is a default value
+            - XAPP_DURATION=200 # 20s is a default value
         depends_on:
             - flexric
         networks:

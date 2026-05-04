@@ -1,14 +1,7 @@
 #!/bin/bash
 
 # Start the main application
-echo "Starting the monitoring components"
-cd monitoring
-docker compose up -d
-
-sleep 10
-
 echo "Starting the core components"
-cd ..
 cd core
 docker compose up -d
 
