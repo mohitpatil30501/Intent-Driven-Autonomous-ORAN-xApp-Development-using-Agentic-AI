@@ -7,8 +7,7 @@ from langchain_core.messages import AIMessage
 # Import the decomposer node from module_1
 from module_1.decomposer import decomposer_node
 from module_2.mapper import module_2_technical_node
-from module_3.synthesizer import module_3_data_node
-from module_3.profiler import dataset_profiler_node
+from module_3.data_engineer import module_3_data_node
 from module_4.ml_dev import module_4_ml_dev_node
 from module_5.core_programmer import module_5_logic_dev_node
 from module_6.integrator import module_6_integrator_node
@@ -18,7 +17,7 @@ class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
     blueprint: Dict[str, Any]
     is_complete: bool
-    user_dataset_path: Optional[str]   # None = auto-synthesize; str = user-provided path
+    user_dataset_input: str   # Natural language from user about data
 
 def ask_human(state: AgentState):
     """
@@ -40,13 +39,12 @@ def ask_dataset(state: AgentState) -> dict:
             content=(
                 "Technical mapping is complete.\n"
                 f"Required RAN telemetry columns (FlexRIC-validated): {cols}\n\n"
-                "Do you have an existing dataset you would like to use?\n"
-                "  • Type 'no' to auto-generate synthetic data\n"
-                "  • Or paste an absolute path to your data file or directory\n"
-                "    (e.g., /home/user/spotlight_dataset/ or /data/traffic.csv)\n\n"
-                "Multi-file and nested-folder datasets are supported. The system will "
-                "discover files, filter to RAN-reportable columns only (verified against "
-                "the FlexRIC codebase), and map them to the required telemetry variables."
+                "Please specify your data availability. You can provide existing datasets or request synthetic generation.\n"
+                "Examples:\n"
+                "  • 'Generate all synthetic data' (or 'no')\n"
+                "  • 'Use /path/to/data/ for all data'\n"
+                "  • 'Use /path/to/ml_data/ for training/testing, but synthesize streaming data'\n\n"
+                "Please describe what data you have and what needs to be synthesized. If you provide a path, we will profile it. If you need synthetic data, we will generate it."
             )
         )]
     }
@@ -55,12 +53,10 @@ def receive_dataset(state: AgentState) -> dict:
     """
     Interrupt node — graph pauses BEFORE this runs.
     After the user types their response, this node reads it and
-    persists the dataset path into state (or None for 'no').
+    persists the dataset input into state.
     """
     last_msg = state["messages"][-1].content.strip() if state.get("messages") else "no"
-    if last_msg.lower() in ("no", "n", "synthesize", ""):
-        return {"user_dataset_path": None}
-    return {"user_dataset_path": last_msg}
+    return {"user_dataset_input": last_msg}
 
 def should_continue(state: AgentState):
     """
@@ -86,15 +82,7 @@ def check_confirmation(state: AgentState):
 
     return "intent_decomposer"
 
-def check_dataset_input(state: AgentState) -> str:
-    """
-    Conditional edge (read-only): routes to dataset_profiler if the user
-    provided a path, otherwise routes to the existing data_synthesizer.
-    """
-    path = state.get("user_dataset_path")
-    if path and path.strip():
-        return "dataset_profiler"
-    return "data_synthesizer"
+
 
 def should_run_ml(state: AgentState):
     """
@@ -116,8 +104,7 @@ builder.add_node("ask_human", ask_human)
 builder.add_node("technical_mapper", module_2_technical_node)
 builder.add_node("ask_dataset", ask_dataset)
 builder.add_node("receive_dataset", receive_dataset)
-builder.add_node("data_synthesizer", module_3_data_node)
-builder.add_node("dataset_profiler", dataset_profiler_node)
+builder.add_node("data_engineer", module_3_data_node)
 builder.add_node("ml_dev", module_4_ml_dev_node)
 builder.add_node("logic_dev", module_5_logic_dev_node)
 builder.add_node("integrator", module_6_integrator_node)
@@ -148,33 +135,16 @@ builder.add_conditional_edges(
 builder.add_edge("technical_mapper", "ask_dataset")
 builder.add_edge("ask_dataset", "receive_dataset")
 
-# After receive_dataset, route to profiler or synthesizer
-builder.add_conditional_edges(
-    "receive_dataset",
-    check_dataset_input,
-    {
-        "data_synthesizer": "data_synthesizer",
-        "dataset_profiler": "dataset_profiler",
-    }
-)
+# After receive_dataset, route to data_engineer
+builder.add_edge("receive_dataset", "data_engineer")
 
-# After data_synthesizer, check if ML is needed
+# After data_engineer, check if ML is needed
 builder.add_conditional_edges(
-    "data_synthesizer",
+    "data_engineer",
     should_run_ml,
     {
         "ml_dev": "ml_dev",
         "logic_dev": "logic_dev"
-    }
-)
-
-# After dataset_profiler, same ML routing gate
-builder.add_conditional_edges(
-    "dataset_profiler",
-    should_run_ml,
-    {
-        "ml_dev": "ml_dev",
-        "logic_dev": "logic_dev",
     }
 )
 
