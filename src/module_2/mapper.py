@@ -22,10 +22,10 @@ Your ONLY job is to map the "requested_Telemetry_NL" and "target_Action_What_NL"
 CRITICAL RULES — NO HALLUCINATIONS:
 1. You MUST use `semantic_search_summary` to look up the FlexRIC codebase. Never guess variable names.
 2. TRACE NESTED TYPES: If a field is a struct or a pointer to a struct (e.g., `fr_slice_t* slices`), you MUST find the definition of that struct type to see its inner fields (like `id`).
-3. UNIONS & VARIANTS: When you encounter a `union`, you MUST identify the discriminator field (usually an `enum` like `type` or `conf`) that indicates which union member is active. Map the telemetry to the specific union member path (e.g., `ind.msg.slice_conf.dl.slices[i].params.u.nvs.u.rate.u1.mbps_required` for NVS rates).
-4. ARRAYS & POINTERS: If a variable is part of an array or a list, use the `[i]` index notation (e.g., `ind.msg.slice_conf.dl.slices[i].id`).
-5. ENTRY POINT: Use `ind.msg` as the default root for indication messages unless the codebase shows otherwise (e.g., `ind.msg.tstamp`).
-6. NO TEMPLATES: Map to actual C struct/union fields. Do not use generic template placeholders.
+3. UNIONS & VARIANTS: When you encounter a `union`, you MUST expose the different attributes and possible variants as nested objects within the JSON structure so the complete object is visible.
+4. HIERARCHICAL JSON OUTPUT: The target output for Telemetry_Variables MUST be a hierarchical JSON object representing the complete streaming dataset payload structure, NOT a flat list of separate variables. Represent arrays in C as JSON arrays (`[]`) and structs as JSON objects (`{}`).
+5. ENTRY POINT: Consider the indication message (`ind.msg`) as the root of your JSON schema unless the codebase shows otherwise.
+6. NO TEMPLATES: Map to actual C struct/union field types. Do not use generic template placeholders.
 
 --- SEARCH STRATEGY ---
 1. CALL 1: Find the main Indication Message struct for the likely Service Model (e.g., SLICE, KPM, RC).
@@ -43,13 +43,19 @@ Output a strict JSON code block:
   },
   "Technical_Mapping": {
     "Reporting_Service_Model": "MAC | KPM | RLC | RC | SLICE",
-    "Telemetry_Variables": [
-      {
-        "NL_name": "human-readable name from Module 1",
-        "C_variable": "exact path (e.g. ind.msg.slice_conf.dl.slices[i].id)",
-        "data_type": "uint32_t | uint64_t | float | char*"
-      }
-    ],
+    "Telemetry_Variables": {
+      "// description": "A hierarchical JSON object reflecting the streaming dataset structure",
+      "slices": [
+        {
+          "id": "uint32_t",
+          "label": "char*",
+          "params": {
+            "type": "slice_algorithm_e /* enum */",
+            "...": "..."
+          }
+        }
+      ]
+    },
     "Control_Service_Model": "MAC | RC | SLICE | ...",
     "Action_Space_Menu": [
       {
