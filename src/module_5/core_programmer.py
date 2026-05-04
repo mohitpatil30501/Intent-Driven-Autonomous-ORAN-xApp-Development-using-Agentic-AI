@@ -20,10 +20,18 @@ CRITICAL RULES - PURE LOGIC ONLY:
 2. Your code must be 100% independent, stateful, and object-oriented.
 3. Every decision your code makes MUST exactly match one of the schemas in `Technical_Mapping.Action_Space_Menu`.
 
+--- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
+Your work is incomplete and a FAILURE until you have:
+1. CREATED the `logic/` and `log/` directories using your tools.
+2. WRITTEN the `logic/core_logic.py` script.
+3. EXECUTED the script using `python3 logic/core_logic.py`.
+4. VERIFIED the script processes the `data/streaming_mock_data.json` file without errors and produces valid actions.
+5. READ the terminal output and SAVED it to `log/module_5_logic.log`. If it crashes, YOU MUST FIX IT and re-run.
+
 --- STRICT WORKFLOW INSTRUCTIONS ---
 You must use your tools to execute the following steps in order:
 
-1. CREATE DIRECTORY: Create a folder named `logic/` inside the workspace.
+1. PREPARE: Create `logic/` and `log/` folders inside the workspace.
 2. WRITE SCRIPT: Write `logic/core_logic.py`. This script MUST contain:
    - A class named `XAppLogic`.
    - An `__init__(self)` method. ONLY load a `.pkl` model file if `ML_Model_Artifacts` explicitly exists in the blueprint. If `cycle_Type` is `Pure_Logic` or `ML_Model_Artifacts` is absent, the `__init__` must be empty (no model loading, no sklearn imports). IGNORE any `model_acceptance_criteria` field — it is irrelevant for Pure_Logic.
@@ -33,11 +41,11 @@ You must use your tools to execute the following steps in order:
 3. WRITE TEST LOOP: At the bottom of `logic/core_logic.py`, write an `if __name__ == '__main__':` block that:
    - Loads `Data_Paths.streaming_mock_data_path` using the `json` module.
    - Instantiates `XAppLogic()`.
-   - Iterates through the JSON array, and passes the entire object (or its `data` payload depending on how your process_interval expects it) to `process_interval()`.
+   - Iterates through the JSON array, and passes the `data` payload to `process_interval()`.
    - Prints the output decisions.
 
-4. EXECUTE SCRIPT: Run `python3 logic/core_logic.py`. If it crashes (e.g., KeyError, model shape mismatch), read the terminal error, fix the script, and run it again.
-   - **CRITICAL**: Read the output of your test loop! The logic MUST NOT simply return `DO_NOTHING` for every single row. If it doesn't trigger the expected action for at least some rows (based on anomaly spikes in the data), your logic threshold or logic implementation is wrong. You MUST rewrite the logic to properly achieve the goal defined in the Blueprint and run it again.
+4. MANDATORY EXECUTION: Run `python3 logic/core_logic.py` and redirect output to `log/module_5_logic.log`.
+   - **CRITICAL**: Read the log! The logic MUST NOT simply return `DO_NOTHING` for every single row. If it doesn't trigger the expected action for at least some rows (based on anomaly spikes in the data), your logic threshold or logic implementation is wrong. You MUST rewrite the logic to properly achieve the goal defined in the Blueprint and run it again.
 
 --- RESPONSE FORMAT ---
 ONLY after the script has executed successfully and the logic works, output a final JSON block updating the blueprint.

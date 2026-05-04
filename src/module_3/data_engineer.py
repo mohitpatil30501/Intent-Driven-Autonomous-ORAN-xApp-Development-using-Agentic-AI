@@ -27,15 +27,37 @@ An xApp deployed on a real RAN can ONLY receive metrics that FlexRIC can actuall
 CRITICAL RULE — MINIMAL TOOL USAGE:
 Do NOT use tools unnecessarily. Rely entirely on the Blueprint and Technical Mapping provided in your prompt. Use tools ONLY when absolutely necessary (e.g., reading user-provided dataset directories or writing output files). If the user requests purely synthetic data, skip dataset discovery and just write the generation script.
 
-CRITICAL RULE — REALISTIC DATA SYNTHESIS:
-Do NOT generate completely random noise (e.g., plain `np.random.rand()`). Synthesized data MUST exhibit consistency and logical relationships between parameters that reflect the `Intent_Blueprint.objective_Why` or `goal`. For example, if the objective is anomaly detection or load balancing, generate baseline normal traffic patterns with distinct, correlated events (e.g., when throughput drops, latency and buffer occupancy rise). Use mathematical functions (sine waves, trending slopes, correlated variables) to build a realistic scenario.
+CRITICAL RULE — DATA SYNTHESIS BLUEPRINT (NO RANDOM NOISE):
+Your synthesized data MUST be mathematically and logically consistent. Avoid `np.random.rand()` for primary signals.
+1. TEMPORAL CONTINUITY: Streaming and ML data are time-series. Each row must depend on the previous row. Use random walks (`np.cumsum(np.random.normal(0, scale, size))`) or Sine waves with noise to ensure stability.
+2. CROSS-FEATURE CORRELATION: Features must relate to each other. Define a 'master' variable (e.g., `num_ues`) and derive others: `throughput = num_ues * base_kbps * (1 - congestion_factor)`. If `latency` is a variable, it should rise when `throughput` drops or `buffer_occupancy` rises.
+3. GOAL-DRIVEN EVENTS: If the `Intent_Blueprint.goal` involves anomaly detection, inject a specific, recognizable anomaly pattern (e.g., a 5-minute spike/drop) at a specific timestamp.
+4. VECTORIZED LOGIC: Use `numpy` to generate arrays of signals first, then combine them into a DataFrame.
+   Example Logic:
+   ```python
+   t = np.linspace(0, 10, num_rows)
+   base_load = 50 + 20 * np.sin(t) # Diurnal cycle
+   noise = np.random.normal(0, 2, num_rows)
+   load = base_load + noise
+   latency = 5 + (load ** 1.5) / 100 + np.random.normal(0, 0.5, num_rows)
+   ```
+5. STRUCTURAL INTEGRITY: The streaming JSON must exactly map these correlated values into the hierarchical `Technical_Mapping` schema.
+
+--- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
+Your work is incomplete and a FAILURE until you have:
+1. CREATED the `data/` and `log/` directories using your tools.
+2. WRITTEN the `data/build_streaming_datasets.py` script.
+3. EXECUTED that script using `python3 data/build_streaming_datasets.py`.
+4. VERIFIED the output files exist and contain the correct columns/data using `ls` and `head`.
+5. READ the terminal output for any errors. If it fails (e.g., "Directory does not exist"), YOU MUST FIX IT and re-run.
 
 --- STRICT WORKFLOW INSTRUCTIONS ---
 Execute the following steps IN ORDER using your tools.
 
-STEP 1: ANALYZE USER INPUT & REQUIREMENTS
+STEP 1: ANALYZE & PREPARE
 - Read the "User Data Availability" string to understand what data needs to be synthetic and what is provided as paths.
 - Note `Intent_Blueprint.cycle_Type`. If "Pure_Logic", ONLY `data/streaming_mock_data.json` is needed. If "Supervised_ML" or "Unsupervised_ML", you ALSO need `data/historical_training_data.csv` and `data/test_data.csv`.
+- **MANDATORY**: Create the `data/` and `log/` directories immediately if they do not exist.
 
 STEP 2: DISCOVER & PROFILE PROVIDED DATASETS (If any user paths are provided)
 - Discover files in the provided path(s).
@@ -45,22 +67,23 @@ STEP 2: DISCOVER & PROFILE PROVIDED DATASETS (If any user paths are provided)
 - For ML datasets, use `semantic_search_summary` to FlexRIC-validate any remaining unmatched columns.
 
 STEP 3: GENERATE / MERGE DATAFRAMES
-- Write a python script `data/build_streaming_datasets.py` (using pandas, numpy, and json). You MUST use the `write_file` tool to create this script on disk. Do NOT try to run inline python scripts or heredocs (`python -c` or `python - << 'EOF'`) using the `terminal_command` tool. This script MUST:
+- Write a python script `data/build_streaming_datasets.py` (using pandas, numpy, and json). This script MUST:
   a. Load provided datasets (if any) and select ONLY the matched required columns and FLEXRIC_VALID columns. Rename them to their exact leaf node names.
-  b. Synthesize any missing required leaf nodes using correlated, mathematically sound patterns (NOT purely random) based on the xApp objective.
-  c. For SYNTHETIC streaming data, generate a JSON file `data/streaming_mock_data.json` with 100-500 items. It MUST be a JSON array `[ {"timestamp": 1600000000, "data": { <Module 2 Telemetry_Variables schema> }}, ... ]`. If they want to use an existing dataset for streaming, you must convert the relevant flat CSV rows into this exact hierarchical JSON structure by mapping the column values to the corresponding leaf nodes in the schema.
-  d. If ML is required and the user wants SYNTHETIC ML data, generate 5000 rows for `data/historical_training_data.csv` and 1000 rows for `data/test_data.csv` using numpy vectorization.
-  e. If ML is required and the user provided an ML dataset, split the loaded/validated dataset into training (80%) and testing (20%).
+  b. Synthesize any missing required leaf nodes using the **Data Synthesis Blueprint** above.
+  c. **CRITICAL**: If you are synthesizing both the ML datasets and the streaming JSON, they MUST share the same underlying mathematical distribution and correlation logic. The streaming data should ideally be a continuation or a representative slice of the same signal used for training.
+  d. For SYNTHETIC streaming data, generate a JSON file `data/streaming_mock_data.json` with 100-500 items. It MUST be a JSON array `[ {"timestamp": 1600000000, "data": { <Module 2 Telemetry_Variables schema> }}, ... ]`.
+  e. If ML is required and the user wants SYNTHETIC ML data, generate 5000 rows for `data/historical_training_data.csv` and 1000 rows for `data/test_data.csv`.
   f. Save the required files to `data/`.
+- **MANDATORY EXECUTION**: Run `python3 data/build_streaming_datasets.py` using your tools. If it fails, fix the code and re-run.
 
 STEP 4: CROSS-VALIDATE EVERY OUTPUT FILE
-- For the CSVs written in Step 3, run a Python one-liner to print shape and head(3).
+- **MANDATORY**: Use `ls data/` to confirm files are created.
+- For the CSVs, run a Python one-liner to print shape and head(3).
 - For the streaming JSON, run a one-liner to print its length and first 2 items.
 - Mandatory checks:
   - All required leaf node columns are present in the datasets (prior to JSON restructuring).
   - No column is all-zero or constant.
   - If Supervised_ML, ensure a label column exists in both training and test CSVs.
-  - If the script fails or data is incorrect, rewrite and re-run.
 
 STEP 5: DETERMINE training_data_profile
 - Set to one of:
@@ -157,7 +180,7 @@ def module_3_data_node(state: dict) -> dict:
     )
 
     try:
-        recursion_limit = int(os.getenv("RECURSIVE_LIMIT", 25))
+        recursion_limit = int(os.getenv("RECURSIVE_LIMIT", 40))
         result = data_agent.invoke(
             {"messages": [HumanMessage(content=prompt_content)]},
             {"recursion_limit": recursion_limit},

@@ -41,26 +41,33 @@ CRITICAL RULES:
 5. `{{ REPORT_INTERVAL }}` -> E.g., `ric.Interval_ms_10`
 6. `{{ SM_RM_REPORT_FUNCTION }}` -> E.g., `ric.rm_report_mac_sm`
 
+--- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
+Your work is incomplete and a FAILURE until you have:
+1. CREATED the `log/` directory using your tools.
+2. WRITTEN the `final_xapp.py` script with all placeholders replaced.
+3. EXECUTED a syntax check using `python3 -m py_compile final_xapp.py`.
+4. READ the terminal output and SAVED it to `log/module_6_integrator.log`.
+5. FIXED any syntax errors or missing imports reported by the compiler.
+
 --- WORKFLOW (4 STEPS, execute in order) ---
 
 STEP 1 — RAG LOOKUP:
   Call `semantic_search_summary(query="<SM> SM indication callback struct fields xApp example")`.
   Read the returned signatures directly from the response text.
   Do NOT call read_file on any path mentioned in the search result.
-  If semantic_search_summary does not return enough information, you may use `semantic_search_detailed` to see the full code. Use detailed search ONLY when necessary to avoid token limit issues.
+  If semantic_search_summary does not return enough information, you may use `semantic_search_detailed`.
 
 STEP 2 — READ TEMPLATE:
   Call `read_file` with filename `flexric_template.py`.
 
 STEP 3 — WRITE OUTPUT:
-  Call `write_file` with filename `final_xapp.py` containing the fully completed xApp
-  with all 6 placeholders replaced.
+  Call `write_file` with filename `final_xapp.py` containing the fully completed xApp with all 6 placeholders replaced.
 
-STEP 4 — SYNTAX CHECK + LOG:
+STEP 4 — MANDATORY VERIFICATION:
   Call `terminal_command` with:
     `mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log`
-  If py_compile reports a syntax error, fix the file with write_file and re-run py_compile.
-  Once the file compiles cleanly, output the Final_Deployment JSON.
+  If py_compile reports a syntax error, YOU MUST fix the code and re-run this step.
+  Only output the Final_Deployment JSON once the code is valid.
 
 --- RESPONSE FORMAT ---
 ```json

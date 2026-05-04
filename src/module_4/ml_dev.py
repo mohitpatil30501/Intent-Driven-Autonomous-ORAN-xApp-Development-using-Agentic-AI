@@ -24,10 +24,18 @@ CRITICAL RULES - NO NETWORK CODE:
 You do NOT write FlexRIC, E2, or real-time networking code. Your ONLY job is to write a standard Python ML training script that reads a CSV, trains a model, and saves it.
 Only save the best model to `ml/saved_model.pkl`. Do not leave weaker candidate model files behind.
 
+--- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
+Your work is incomplete and a FAILURE until you have:
+1. CREATED the `ml/` and `log/` directories using your tools.
+2. WRITTEN the `ml/train.py` script.
+3. EXECUTED the script using `python3 ml/train.py`.
+4. VERIFIED that `ml/evaluation_report.json` was created and contains the results.
+5. READ the terminal output for any errors. If it crashes, YOU MUST FIX IT and re-run.
+
 --- STRICT WORKFLOW INSTRUCTIONS ---
 You must use your tools to execute the following steps in order:
 
-1. CREATE DIRECTORY: Create a folder named `ml/` inside the workspace.
+1. PREPARE: Create `ml/` and `log/` folders inside the workspace.
 2. DATA EXPLORATION: Inspect the train and test data before choosing an algorithm. Run ONE combined one-liner:
    python3 -c "
 import pandas as pd
@@ -48,9 +56,8 @@ if 'label' in train.columns: print('Label dist:', train['label'].value_counts().
    a. Load training and test CSVs.
    b. Feature columns = all columns except `label`, `ue_id`, `timestamp`, `time`, `index`, `id`.
    c. Preprocess with a pipeline (imputer + scaler + estimator).
-   d. Train up to MAX_TRAINING_ATTEMPTS configurations (env var, default 3).
+   d. Train up to MAX_TRAINING_ATTEMPTS configurations.
    e. After EACH attempt, immediately overwrite `ml/evaluation_report.json` with the CURRENT best result.
-      This ensures the report is always on disk even if the script is interrupted.
       Format: {"threshold": <float>, "metric_policy": <str>, "best_metric_name": <str>,
                "best_metric_value": <float>, "threshold_met": <bool>, "technique_used": <str>,
                "expected_input_features": [<list>], "evaluation_report_path": "ml/evaluation_report.json",
@@ -60,9 +67,8 @@ if 'label' in train.columns: print('Label dist:', train['label'].value_counts().
    - Supervised with labels: use accuracy by default; F1 if labels are imbalanced.
    - Unsupervised with labeled test: use anomaly F1 (1=anomaly, 0=normal).
    - No labels on test: use a quality metric but mark `threshold_met` as advisory in the report.
-7. EXECUTE: Run `python3 ml/train.py`. If it crashes, read stderr, fix the script, and re-run ONCE.
-   Do NOT re-run more than once if the script itself completes but the metric is below threshold — the
-   evaluation_report.json already records the miss, which is sufficient.
+7. MANDATORY EXECUTION: Run `python3 ml/train.py`. If it crashes, read stderr, fix the script, and re-run.
+   Do NOT re-run more than once if the script itself completes but the metric is below threshold.
 8. VERIFY: After the script exits, run:
    python3 -c "import json; r=open('ml/evaluation_report.json').read(); print(r[:500])"
    Confirm `ml/evaluation_report.json` exists and contains valid JSON.
