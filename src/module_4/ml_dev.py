@@ -10,6 +10,7 @@ from langchain_ollama import ChatOllama
 # Add the src folder to path so we can import from tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools, WORKSPACE_DIR
+from tools.context_utils import limit_tool_messages
 
 DEFAULT_ACCEPTANCE_THRESHOLD = 0.85
 DEFAULT_METRIC_POLICY = "task_aware"
@@ -215,7 +216,7 @@ def module_4_ml_dev_node(state: dict) -> dict:
     )
 
     llm = get_llm()
-    ml_agent = create_react_agent(model=llm, tools=workspace_tools, prompt=MODULE_4_SYSTEM_PROMPT)
+    ml_agent = create_react_agent(model=llm, tools=workspace_tools, prompt=MODULE_4_SYSTEM_PROMPT, pre_model_hook=limit_tool_messages)
 
     final_text = ""
     try:

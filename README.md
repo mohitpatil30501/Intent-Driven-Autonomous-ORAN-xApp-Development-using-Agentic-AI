@@ -17,7 +17,7 @@ Human review / confirmation  [INTERRUPT]
    |
    v
 Module 2: Technical Mapper
-   |  Queries FlexRIC Structural RAG (port 7070) — 2 calls max
+   |  Queries Semantic Search (port 7080) — 2 calls max
    |  Adds FlexRIC service-model and variable mappings
    v
 Dataset question  [INTERRUPT]
@@ -41,7 +41,7 @@ Module 5: Core Programmer
    |  Creates and tests standalone XAppLogic
    v
 Module 6: xApp Integrator
-   |  Queries FlexRIC Structural RAG (1 call) for struct field names
+   |  Queries Semantic Search (1 call) for struct field names
    |  Injects logic into FlexRIC template
    v
 Final xApp artifact
@@ -63,9 +63,8 @@ The main graph is defined in `src/agent.py`. It uses LangGraph's `StateGraph` an
 |   |-- module_4
 |   |-- module_5
 |   |-- module_6
-|   |-- structural_rag          # FlexRIC Structural RAG pipeline + FastAPI server
 |   |-- tools
-|   |   |-- structural_rag      # LangChain tool wrappers for the RAG API
+|   |   |-- semantic_search     # Semantic Search Docker + Tool API wrappers
 |   |   |-- workspace           # File + terminal tools for ReAct agents
 |   |   `-- oriosearch          # O-RAN web search (Docker)
 |   `-- workspace               # All generated artifacts land here
@@ -188,17 +187,17 @@ Location: `src/module_2/mapper.py`
 
 Role: O-RAN engineer.
 
-Module 2 translates the plain-English blueprint into concrete FlexRIC technical mappings using the **FlexRIC Structural RAG** instead of a raw vector search. The Structural RAG returns compact, pre-formatted context blocks (signatures + one-line summaries + call-graph edges) capped at ~3 500 characters per call, which eliminates the token explosion seen with raw code chunk retrieval.
+Module 2 translates the plain-English blueprint into concrete FlexRIC technical mappings using **Semantic Search**.
 
 **Search strategy — 2 calls maximum:**
 
-1. `flexric_rag_context(query="<SM> SM indication struct telemetry variables", sm_type="<MAC|KPM|RLC|RC>")` — finds the exact C variable names for the requested metrics.
-2. `flexric_rag_context(query="<SM> SM control message struct action", sm_type="<MAC|KPM|RLC|RC>")` — finds the control struct fields and action types.
+1. `semantic_search_summary(query="<SM> SM indication struct telemetry variables")` — finds the exact C variable names for the requested metrics.
+2. `semantic_search_summary(query="<SM> SM control message struct action")` — finds the control struct fields and action types.
 
 Available tools:
 
-- `flexric_rag_context`: `POST /context` on the Structural RAG server (port 7070). Returns a compact, token-bounded text block — the primary search tool.
-- `flexric_rag_retrieve`: `POST /retrieve` on the Structural RAG server. Returns full metadata including `is_xapp_example`, `sm_type`, and call-graph relationships. Use when metadata inspection is needed.
+- `semantic_search_summary`: Primary search tool that returns broad context and code snippets.
+- `semantic_search_detailed`: Only used when full function bodies are needed.
 - `restricted_domain_search`: web search via OrioSearch (port 8000), restricted to domains such as `o-ran-sc.org`. Used only as a fallback.
 
 Main function:
@@ -294,12 +293,12 @@ Activated when the user provides a file or directory path at the dataset prompt.
 **Design principle — RAN-reportable columns only:** An xApp deployed on a real RAN (srsRAN via FlexRIC service models) can only receive metrics that FlexRIC can actually report. The profiler enforces this by:
 
 1. Accepting only columns from `Technical_Mapping.Telemetry_Variables[*].C_variable` as required (these are already FlexRIC-validated by Module 2).
-2. Validating any additional columns for ML enrichment against the FlexRIC codebase using `exact_keyword_search` (backed by the Structural RAG server). Columns with no FlexRIC match are excluded.
+2. Validating any additional columns for ML enrichment against the FlexRIC codebase using `semantic_search_summary`. Columns with no FlexRIC match are excluded.
 
 **Handling large and multi-file datasets:** The profiler uses a two-phase approach:
 
 - **Phase 1 — Python pre-filter (no LLM):** A generated script loads only column headers (zero-row read), detects dtypes from a 500-row sample, and drops non-numeric, admin/infrastructure, and zero-variance columns. This reduces a 280-column dataset to a manageable candidate list before any LLM reasoning begins.
-- **Phase 2 — LLM reasoning on the reduced set:** The agent matches the candidate columns to required telemetry variables (exact → case-insensitive → normalized → semantic) and validates additional columns with `exact_keyword_search`.
+- **Phase 2 — LLM reasoning on the reduced set:** The agent matches the candidate columns to required telemetry variables (exact → case-insensitive → normalized → semantic) and validates additional columns with `semantic_search_summary`.
 
 Main function:
 
@@ -449,7 +448,7 @@ Location: `src/module_6/integrator.py`
 
 Role: FlexRIC integrator.
 
-Module 6 injects the tested `XAppLogic` class into a FlexRIC Python SDK template. It uses the Structural RAG with a single targeted call to resolve how to access the correct C-struct fields for the detected service model (e.g. `ind.ue_stats[0].wb_cqi` vs `ind.mac_stats[0].dl_aggr_tbs`).
+Module 6 injects the tested `XAppLogic` class into a FlexRIC Python SDK template. It uses semantic search with a single targeted call to resolve how to access the correct C-struct fields for the detected service model (e.g. `ind.ue_stats[0].wb_cqi` vs `ind.mac_stats[0].dl_aggr_tbs`).
 
 **Context-budget design:** Only the fields Module 6 actually needs are extracted from the full blueprint before being passed to the agent. This significantly reduces the initial prompt size compared to dumping the entire blueprint (which includes ML artifacts, data paths, synthesizer metadata, and Module 5 terminal logs that are irrelevant at this stage).
 
@@ -467,7 +466,7 @@ Fields excluded: `Data_Paths`, `ML_Model_Artifacts`, all synthesizer/profiler me
 
 **Strict 4-step workflow:** The system prompt enforces exactly 4 tool calls in sequence, eliminating the open-ended loop that caused the agent to burn through its recursion budget:
 
-1. `flexric_rag_context` — one RAG call for struct field patterns
+1. `semantic_search_summary` — one search call for struct field patterns
 2. `read_file flexric_template.py` — read the template once
 3. `write_file final_xapp.py` — write the completed xApp once
 4. `terminal_command "mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log"` — syntax check and log in one combined command
@@ -518,70 +517,18 @@ The module does not execute the final xApp because a live RIC/FlexRIC environmen
 python3 -m py_compile final_xapp.py
 ```
 
-## FlexRIC Structural RAG
+## Semantic Search
 
-Location: `src/structural_rag/`  
-Tool wrappers: `src/tools/structural_rag/flexric_rag_tool.py`
+Location: `src/tools/semantic_search/`
+Tool wrappers: `src/tools/semantic_search/semantic_search_tool.py`
 
-The Structural RAG is the primary FlexRIC codebase search backend used by Modules 2 and 6. It replaces raw dense-vector search (which returned full C function bodies and caused multi-million token usage) with compact, structured retrieval.
+The Semantic Search tool provides codebase exploration capabilities for the agent.
 
-### Why Structural RAG instead of dense vector search
-
-| | Dense vector search (old) | Structural RAG (current) |
-|---|---|---|
-| Chunk format | Raw function body (100–300 lines of C) | Signature + 1-sentence summary + call edges |
-| Token cost per result | ~1 000–3 000 tokens/chunk | ~80–150 tokens/chunk |
-| Result cap | None | `max_chars` parameter (default 3 500) |
-| Exact symbol lookup | Separate `exact_keyword_search` call required | BM25 index handles it in the same call |
-| SM-type filtering | None | `sm_type=MAC/KPM/RLC/RC` filters at retrieval time |
-| xApp example surfacing | Random luck | Always prioritised via +0.30 score boost |
-
-A single Structural RAG call replaces 3–10 search iterations, cutting Module 2 token usage from millions to tens of thousands per run.
-
-### Pipeline stages
-
-1. **AST parsing** (`core/parser.py`): extracts semantically complete functions, structs, and classes from every `.c`, `.h`, and `.py` file. Uses tree-sitter when available, regex fallback otherwise.
-2. **Call graph building** (`core/callgraph.py`): builds a bidirectional directed call graph. Flags xApp↔E2AP boundary edges (highest hallucination risk).
-3. **NL summarization** (`summarize/summarizer.py`): generates one English sentence per function for intent-based query matching. Supports Ollama, HuggingFace, llama.cpp, GPT4All, TF-IDF, and no-op backends.
-4. **Hybrid indexing** (`index/builder.py`): builds `code_index.faiss` (CodeBERT), `nl_index.faiss` (MiniLM), `bm25.pkl` (BM25Okapi), and `graph.pkl` (networkx DiGraph).
-5. **Retrieval** (`retrieval/retriever.py`): RRF fusion of all three indexes, graph expansion (1–2 hops), FlexRIC reranking boosts.
-
-The index is pre-built at `src/structural_rag/flexric_index/`.
-
-### FastAPI server (`server.py`)
-
-Wraps the retriever as an HTTP service for LangChain tools to call.
-
-| Endpoint | Purpose |
-|---|---|
-| `GET /health` | Liveness check |
-| `POST /retrieve` | Full retrieval with metadata, scores, call-graph info, and `llm_context` block |
-| `POST /context` | Lightweight — returns only the pre-formatted context string; accepts `max_chars` |
-| `GET /schema` | OpenAI/Anthropic-compatible tool definitions |
-
-Start command (from `src/structural_rag/`):
+Start command:
 
 ```bash
-FLEXRIC_INDEX_DIR=./flexric_index/index \
-uvicorn server:app --host 0.0.0.0 --port 7070
-```
-
-### LangChain tool wrappers (`src/tools/structural_rag/flexric_rag_tool.py`)
-
-Three tools, all pointing at `STRUCTURAL_RAG_URL` (default `http://localhost:7070`):
-
-- `flexric_rag_context`: primary tool for code generation prompts. Calls `POST /context`, returns ≤3 500 chars of formatted context.
-- `flexric_rag_retrieve`: use when metadata inspection is needed (`is_xapp_example`, `sm_type`, `called_by`). Calls `POST /retrieve`.
-- `exact_keyword_search`: backward-compatible alias using `hops=0` for exact identifier lookup. Used by the dataset profiler to validate column names against the FlexRIC codebase.
-
-Import for use in agent tools lists:
-
-```python
-from tools.structural_rag.flexric_rag_tool import (
-    flexric_rag_context,
-    flexric_rag_retrieve,
-    exact_keyword_search,
-)
+cd src/tools/semantic_search
+docker compose up -d --build
 ```
 
 ## Workspace Tools
@@ -665,7 +612,7 @@ The graph is configured through `src/langgraph.json`:
 |---|---|---|
 | `OLLAMA_URL` | `http://localhost:11434` | LLM inference endpoint |
 | `OLLAMA_MODEL` | `GPT-OSS-120B` | Model name |
-| `STRUCTURAL_RAG_URL` | `http://localhost:7070` | FlexRIC Structural RAG API (Modules 2, 6, 3b) |
+| `SEMANTIC_SEARCH_URL` | `http://localhost:7080` | Semantic Search API (Modules 2, 6, 3b) |
 | `ORIOSEARCH_URL` | `http://localhost:8000` | Web search API (Module 2 fallback) |
 
 ### Per-module recursion limits
@@ -686,13 +633,7 @@ Each module has its own recursion limit env var. The global `RECURSIVE_LIMIT` ac
 |---|---|---|
 | `MAX_TRAINING_ATTEMPTS` | `5` | Module 4 candidate training/evaluation retries |
 
-### Structural RAG server variables
 
-| Variable | Default | Description |
-|---|---|---|
-| `FLEXRIC_INDEX_DIR` | `./flexric_index/index` | Path to the built index directory |
-| `FLEXRIC_API_KEY` | _(empty)_ | Optional bearer token; leave empty to disable auth |
-| `FLEXRIC_MAX_TOP_K` | `20` | Hard upper limit on `top_k` per request |
 
 ## Running the LangGraph Agent
 
@@ -707,7 +648,7 @@ A typical interaction is:
 1. User provides an xApp intent.
 2. Module 1 asks targeted questions until the blueprint is complete.
 3. User types `CONFIRM`.
-4. Module 2 runs (2 Structural RAG calls).
+4. Module 2 runs (2 semantic search calls).
 5. The agent asks about an existing dataset; user types `no` or provides a path.
 6. Modules 3–6 run automatically, producing files under `src/workspace`.
 
@@ -736,18 +677,18 @@ python -m unittest discover -s test
 The codebase follows a few important separation-of-concerns rules:
 
 - Module 1 captures intent only; it does not invent O-RAN technical details.
-- Module 2 grounds technical mappings in Structural RAG search results; it does not hallucinate C variables.
+- Module 2 grounds technical mappings in semantic search results; it does not hallucinate C variables.
 - Module 3 creates reproducible data for testing, using numpy vectorized generation.
 - Module 4 trains offline models only; it writes `evaluation_report.json` after every attempt so the result is always visible to the operator.
 - Module 5 writes independent decision logic with no FlexRIC dependencies.
-- Module 6 handles FlexRIC integration glue only; one Structural RAG call resolves struct field names.
+- Module 6 handles FlexRIC integration glue only; one semantic search call resolves struct field names.
 
 This division keeps the generated xApp easier to inspect, test, and debug. The final integration is only attempted after the intent, technical mappings, data, optional model, and core decision logic have been separately produced.
 
 ## Known Operational Assumptions
 
 - Ollama is expected for the main LLM calls unless environment variables point elsewhere.
-- Module 2 and Module 6 expect the FlexRIC Structural RAG server on `http://localhost:7070` (set `STRUCTURAL_RAG_URL` to override). The index is pre-built at `src/structural_rag/flexric_index/`.
+- Module 2 and Module 6 expect the Semantic Search server on `http://localhost:7080` (set `SEMANTIC_SEARCH_URL` to override).
 - Module 2's restricted web search expects OrioSearch on `http://localhost:8000`.
 - Generated scripts run inside `src/workspace`, so artifact paths in blueprints are relative to that directory.
 - The final xApp syntax check does not prove runtime success against a live RIC; it only verifies Python syntax after template integration.

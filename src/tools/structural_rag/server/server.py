@@ -104,10 +104,10 @@ class RetrieveRequest(BaseModel):
             "2 = extend one more hop."
         ),
     )
-    sm_type: Optional[Literal["KPM", "RC", "MAC", "RLC"]] = Field(
+    sm_type: Optional[str] = Field(
         default=None,
         description=(
-            "Filter results to a specific E2 Service Model. "
+            "Filter results to a specific E2 Service Model (e.g., 'KPM', 'RC', 'SLICE', 'TC'). "
             "Auto-detected from query keywords if omitted."
         ),
     )
@@ -148,7 +148,7 @@ class ContextRequest(BaseModel):
     query: str
     top_k: int = Field(default=8, ge=1, le=20)
     hops: int = Field(default=1, ge=0, le=2)
-    sm_type: Optional[Literal["KPM", "RC", "MAC", "RLC"]] = None
+    sm_type: Optional[str] = None
     max_chars: int = Field(
         default=12000,
         ge=500,
@@ -166,9 +166,13 @@ class ContextResponse(BaseModel):
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 def _sm_flag(sm: Optional[str]) -> Optional[str]:
-    """Map short SM name → full E2SM tag expected by the retriever."""
-    _map = {"KPM": "E2SM_KPM", "RC": "E2SM_RC", "MAC": "E2SM_MAC", "RLC": "E2SM_RLC"}
-    return _map.get(sm) if sm else None
+    """Map short SM name (e.g. 'KPM') → full E2SM tag (e.g. 'E2SM_KPM')."""
+    if not sm:
+        return None
+    sm = sm.upper()
+    if sm.startswith("E2SM_"):
+        return sm
+    return f"E2SM_{sm}"
 
 
 def _build_llm_context(results: list, max_chars: int = 12000) -> str:

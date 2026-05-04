@@ -60,7 +60,7 @@ def flexric_rag_context(
         "top_k": top_k,
         "max_chars": max_chars,
     }
-    if sm_type and sm_type.upper() in ("MAC", "KPM", "RLC", "RC"):
+    if sm_type:
         payload["sm_type"] = sm_type.upper()
 
     result = _post("context", payload)
@@ -100,7 +100,7 @@ def flexric_rag_retrieve(
         "top_k": top_k,
         "hops": hops,
     }
-    if sm_type and sm_type.upper() in ("MAC", "KPM", "RLC", "RC"):
+    if sm_type:
         payload["sm_type"] = sm_type.upper()
 
     result = _post("retrieve", payload)

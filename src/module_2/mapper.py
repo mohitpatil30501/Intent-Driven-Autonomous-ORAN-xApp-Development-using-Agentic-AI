@@ -4,48 +4,34 @@ import os
 import requests
 from typing import Any, Dict
 from langgraph.prebuilt import create_react_agent
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage
 from langchain_ollama import ChatOllama
 from langchain_core.tools import tool
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from tools.structural_rag.flexric_rag_tool import (
-    flexric_rag_context,
-    flexric_rag_retrieve,
-    exact_keyword_search,   # backward-compat alias for profiler.py
-)
 from tools.semantic_search.semantic_search_tool import (
     semantic_search_summary,
     semantic_search_detailed,
 )
+from tools.context_utils import limit_tool_messages
 
 MODULE_2_SYSTEM_PROMPT = """You are "Module 2: The O-RAN Technical Mapper" in an automated xApp development pipeline.
 Your ONLY job is to map the "requested_Telemetry_NL" and "target_Action_What_NL" into EXACT FlexRIC Service Models and C-struct variables.
 
 CRITICAL RULES — NO HALLUCINATIONS:
-1. You MUST use `flexric_rag_context` to look up the FlexRIC codebase. Never guess variable names.
-2. NEVER try to read file paths returned by the tool — the tools return pre-formatted context directly. No extra file reads are needed.
-3. If a metric or action is not in FlexRIC, map it to the closest available metric or note it as unsupported.
+1. You MUST use `semantic_search_summary` to look up the FlexRIC codebase. Never guess variable names.
+2. TRACE NESTED TYPES: If a field is a struct or a pointer to a struct (e.g., `fr_slice_t* slices`), you MUST find the definition of that struct type to see its inner fields (like `id`).
+3. UNIONS & VARIANTS: When you encounter a `union`, you MUST identify the discriminator field (usually an `enum` like `type` or `conf`) that indicates which union member is active. Map the telemetry to the specific union member path (e.g., `ind.msg.slice_conf.dl.slices[i].params.u.nvs.u.rate.u1.mbps_required` for NVS rates).
+4. ARRAYS & POINTERS: If a variable is part of an array or a list, use the `[i]` index notation (e.g., `ind.msg.slice_conf.dl.slices[i].id`).
+5. ENTRY POINT: Use `ind.msg` as the default root for indication messages unless the codebase shows otherwise (e.g., `ind.msg.tstamp`).
+6. NO TEMPLATES: Map to actual C struct/union fields. Do not use generic template placeholders.
 
---- EFFICIENT 2-CALL STRATEGY (follow this exactly) ---
-
-CALL 1 — Telemetry variables:
-  flexric_rag_context(
-      query="<SM type> SM indication struct telemetry variables",
-      sm_type="<MAC|KPM|RLC|RC>",
-  )
-  Read the returned signatures and summaries to find exact C_variable names for the requested metrics.
-
-CALL 2 — Control actions:
-  flexric_rag_context(
-      query="<SM type> SM control message struct action",
-      sm_type="<MAC|KPM|RLC|RC>",
-  )
-  Read the returned context to find the control struct fields and action types for the requested action.
-
-After these 2 calls you have enough information to write the JSON. Do NOT make additional search calls.
-If structural_rag returns insufficient context, you may use `semantic_search_summary` for a broad semantic lookup, and `semantic_search_detailed` ONLY if you need to see the full code body of a specific function.
+--- SEARCH STRATEGY ---
+1. CALL 1: Find the main Indication Message struct for the likely Service Model (e.g., SLICE, KPM, RC).
+2. CALL 2+: If the main struct contains nested structs, pointers, or UNIONS, search for those specific type definitions (e.g., "typedef struct fr_slice_t" or "typedef union slice_params_u").
+3. IDENTIFY DISCRIMINATORS: If a union is involved, find the enum that controls it so you can map specific telemetry to the correct union branch.
+4. DO NOT STOP until you have mapped every requested field or confirmed it's absolutely missing.
 
 --- RESPONSE FORMAT ---
 Output a strict JSON code block:
@@ -56,15 +42,15 @@ Output a strict JSON code block:
     "... (copy from input, unchanged)"
   },
   "Technical_Mapping": {
-    "Reporting_Service_Model": "MAC | KPM | RLC | RC",
+    "Reporting_Service_Model": "MAC | KPM | RLC | RC | SLICE",
     "Telemetry_Variables": [
       {
         "NL_name": "human-readable name from Module 1",
-        "C_variable": "exact FlexRIC struct field name (e.g. dl_aggr_tbs)",
-        "data_type": "uint32_t | uint64_t | float | ..."
+        "C_variable": "exact path (e.g. ind.msg.slice_conf.dl.slices[i].id)",
+        "data_type": "uint32_t | uint64_t | float | char*"
       }
     ],
-    "Control_Service_Model": "MAC | RC | ...",
+    "Control_Service_Model": "MAC | RC | SLICE | ...",
     "Action_Space_Menu": [
       {
         "action_id": "UPDATE_SLICE_PRB",
@@ -110,7 +96,7 @@ def restricted_domain_search(query: str, domain: str = "o-ran-sc.org") -> str:
         return f"Error connecting to oriosearch: {e}"
 
 
-tools = [flexric_rag_context, flexric_rag_retrieve, semantic_search_summary, semantic_search_detailed, restricted_domain_search]
+tools = [semantic_search_summary, semantic_search_detailed, restricted_domain_search]
 
 
 def get_llm():
@@ -134,12 +120,17 @@ def module_2_technical_node(state: dict) -> dict:
     prompt_content = (
         f"Here is the Intent Blueprint from Module 1:\n"
         f"{json.dumps(intent_blueprint, indent=2)}\n\n"
-        f"Use flexric_rag_context (2 calls max) to look up the FlexRIC codebase, "
+        f"Use semantic_search_summary (2 calls max) to look up the FlexRIC codebase, "
         f"then output the Technical_Mapping JSON.{sm_hint}"
     )
 
     llm = get_llm()
-    mapper_agent = create_react_agent(model=llm, tools=tools, prompt=MODULE_2_SYSTEM_PROMPT)
+    mapper_agent = create_react_agent(
+        model=llm, 
+        tools=tools, 
+        prompt=MODULE_2_SYSTEM_PROMPT,
+        pre_model_hook=limit_tool_messages
+    )
 
     try:
         result = mapper_agent.invoke(

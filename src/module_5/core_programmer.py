@@ -9,6 +9,7 @@ from langchain_ollama import ChatOllama
 # Add the src folder to path so we can import from tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
+from tools.context_utils import limit_tool_messages
 
 MODULE_5_SYSTEM_PROMPT = """You are "Module 5: The Core Programmer" in an automated xApp development pipeline.
 Your ONLY job is to write the standalone algorithmic brain of the xApp.
@@ -74,7 +75,8 @@ def module_5_logic_dev_node(state: dict) -> dict:
     logic_agent = create_react_agent(
         model=llm, 
         tools=workspace_tools, 
-        prompt=MODULE_5_SYSTEM_PROMPT
+        prompt=MODULE_5_SYSTEM_PROMPT,
+        pre_model_hook=limit_tool_messages
     )
     
     try:

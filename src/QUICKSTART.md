@@ -40,8 +40,8 @@ OLLAMA_MODEL="llama3.1"
 OLLAMA_MODEL_MAX_TOKENS=4096
 OLLAMA_MODEL_MAX_TIMEOUT=120
 
-# Structural RAG server (started in Step 4)
-STRUCTURAL_RAG_URL=http://localhost:7070
+# Semantic Search server (started in Step 4)
+SEMANTIC_SEARCH_URL=http://localhost:7080
 
 # Per-module recursion limits (increase if a module says "need more steps")
 ML_RECURSIVE_LIMIT=80
@@ -72,25 +72,21 @@ cd src/tools/oriosearch
 docker compose up -d
 ```
 
-### FlexRIC Structural RAG (pre-built index — port 7070)
+### Semantic Search server (Docker — port 7080)
 
-The index is already built at `src/tools/structural_rag/flexric_index/`. Start the FastAPI server:
+Start the Semantic Search API server:
 
 ```bash
-cd src/tools/structural_rag
-FLEXRIC_INDEX_DIR=./flexric_index/index \
-uvicorn server:app --host 0.0.0.0 --port 7070
+cd src/tools/semantic_search
+docker compose up -d --build
 ```
-
-> **Why Structural RAG instead of the old semantic search service?**
-> The previous Docker-based semantic search returned raw C function bodies (100–300 lines each) which caused 3 M+ token usage in Module 2. The Structural RAG server returns compact, pre-formatted context blocks (signatures + summaries + call-graph edges) hard-capped at ~3 500 characters per call, cutting Module 2 token usage by ~100×.
 
 Verify both services are up:
 
 ```bash
 curl http://localhost:8000/health      # OrioSearch
-curl http://localhost:7070/health      # Structural RAG
-# Expected: {"status":"ok",...}
+curl http://localhost:7080/semantic_search -X POST -H "Content-Type: application/json" -d '{"query": "health check", "n_results": 1}'      # Semantic Search
+# Expected successful HTTP responses
 ```
 
 ---
@@ -132,7 +128,7 @@ when a slice drops below 10 Mbps, to prevent slice starvation.
 
 1. **Module 1** asks clarifying questions until the blueprint is complete.
 2. Type **`CONFIRM`** to approve the blueprint and continue.
-3. **Module 2** maps the intent to FlexRIC service-model variables (2 Structural RAG calls).
+3. **Module 2** maps the intent to FlexRIC service-model variables (2 semantic search calls).
 4. The agent asks whether you have an existing dataset:
    - Type **`no`** to auto-generate synthetic data (recommended for new projects). Module 3 will generate exactly 5 000 training rows and 1 000 test rows using numpy vectorized generation.
    - Or paste an **absolute path** to your data file or directory (e.g. `/home/user/my_dataset/`). Multi-file and nested-folder datasets are supported — the profiler will discover files, filter to RAN-reportable columns (verified against the FlexRIC codebase), and map them automatically.
@@ -149,7 +145,7 @@ At the end of the run, check `src/workspace/ml/evaluation_report.json` (ML workf
 | LangGraph server | 2024 | Agent API + Studio backend |
 | OrioSearch API | 8000 | O-RAN web search (Module 2 fallback) |
 | SearXNG | 8080 | Backend for OrioSearch |
-| FlexRIC Structural RAG | 7070 | FlexRIC code search (Modules 2, 6, 3b) |
+| Semantic Search API | 7080 | Code search (Modules 2, 6, 3b) |
 | Ollama | 11434 | LLM inference (on GPU server) |
 
 ---
@@ -176,7 +172,7 @@ src/workspace/
 
 ### Graceful stop
 
-Press `Ctrl+C` in the terminal running `langgraph dev`. This cleanly shuts down the LangGraph server. Docker containers and the Structural RAG uvicorn process are unaffected.
+Press `Ctrl+C` in the terminal running `langgraph dev`. This cleanly shuts down the LangGraph server. Docker containers are unaffected.
 
 ### If the port is still bound after a hard kill
 
@@ -208,7 +204,7 @@ git checkout src/workspace/flexric_template.py   # restore the committed stub
 |---|---|---|
 | LangGraph dev server (port 2024) | No — killed with Ctrl+C | `fuser -k 2024/tcp` if port stays bound |
 | OrioSearch container | Yes — Docker is independent | `cd src/tools/oriosearch && docker compose down` |
-| Structural RAG uvicorn (port 7070) | No — killed with Ctrl+C | `fuser -k 7070/tcp` if port stays bound |
+| Semantic Search (port 7080) | Yes — Docker is independent | `cd src/tools/semantic_search && docker compose down` |
 | Ollama (GPU server) | Yes — separate SSH session | `pkill ollama` on the GPU server if needed |
 
 > The `terminal_command` workspace tool runs subprocesses with a 120-second timeout via `subprocess.run`, so those cannot outlive the LangGraph server process itself — no orphan Python scripts to worry about.
@@ -233,8 +229,8 @@ git checkout src/workspace/flexric_template.py
 ```bash
 cd src/tools/oriosearch && docker compose down
 
-# Stop the Structural RAG server
-fuser -k 7070/tcp
+# Stop the Semantic Search server
+cd src/tools/semantic_search && docker compose down
 ```
 
 ---
@@ -258,28 +254,17 @@ Add the relevant variable to `src/.env` and restart `langgraph dev`.
 
 Check `src/workspace/ml/evaluation_report.json`. If it contains `"status": "AGENT_FAILED"`, the agent hit its limit before training. Increase `ML_RECURSIVE_LIMIT` (e.g. to `120`) and re-run. The `threshold_met` field and best metric value will be in the report even on partial runs.
 
-### Structural RAG server returns connection error
+### Semantic Search server returns connection error
 
 Verify the server is running:
 
 ```bash
-curl http://localhost:7070/health
+curl http://localhost:7080/semantic_search -X POST -H "Content-Type: application/json" -d '{"query": "health check", "n_results": 1}'
 ```
 
 If it is not running, start it:
 
 ```bash
-cd src/tools/structural_rag
-FLEXRIC_INDEX_DIR=./flexric_index/index \
-uvicorn server:app --host 0.0.0.0 --port 7070
-```
-
-If the index directory is missing, rebuild it (takes a few minutes):
-
-```bash
-cd src/tools/structural_rag
-python pipeline.py build \
-    --repo ./flexric \
-    --out  ./flexric_index \
-    --summarizer tfidf
+cd src/tools/semantic_search
+docker compose up -d --build
 ```

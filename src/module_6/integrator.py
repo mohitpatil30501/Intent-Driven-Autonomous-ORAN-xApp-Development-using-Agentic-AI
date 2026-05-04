@@ -8,11 +8,11 @@ from langchain_ollama import ChatOllama
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
-from tools.structural_rag.flexric_rag_tool import flexric_rag_context
 from tools.semantic_search.semantic_search_tool import (
     semantic_search_summary,
     semantic_search_detailed,
 )
+from tools.context_utils import limit_tool_messages
 
 MODULE_6_SYSTEM_PROMPT = """You are "Module 6: The xApp Integrator" in an automated O-RAN development pipeline.
 Your ONLY job is to inject the standalone logic created by Module 5 into a deployable FlexRIC xApp.
@@ -21,7 +21,7 @@ CRITICAL RULES:
 1. You do NOT write algorithms. You ONLY write the mapping "glue" between FlexRIC's C-structs and the Python dictionary expected by `XAppLogic`.
 2. Look at the `Technical_Mapping` in the Blueprint to know which Service Model (SM) to use (e.g., MAC, KPM, RLC) and what the exact C-variables are.
 3. You must read `flexric_template.py` from the workspace and replace the placeholders.
-4. The search tool (`flexric_rag_context`) returns code snippets directly in its response text. Do NOT use `read_file` or any file tool on paths mentioned in search results — those paths are internal to the search index and NOT accessible from the workspace.
+4. The search tools (`semantic_search_summary` and `semantic_search_detailed`) return code snippets directly in their response text. Do NOT use `read_file` or any file tool on paths mentioned in search results — those paths are internal to the search index and NOT accessible from the workspace.
 
 --- PLACEHOLDER REPLACEMENT GUIDE ---
 1. `{{ SM_CALLBACK_BASE }}` -> E.g., `ric.mac_cb`, `ric.rlc_cb`, `ric.kpm_cb`
@@ -43,10 +43,10 @@ CRITICAL RULES:
 --- WORKFLOW (4 STEPS, execute in order) ---
 
 STEP 1 — RAG LOOKUP:
-  Call `flexric_rag_context(query="<SM> SM indication callback struct fields xApp example", sm_type="<MAC|KPM|RLC|RC>")`.
+  Call `semantic_search_summary(query="<SM> SM indication callback struct fields xApp example")`.
   Read the returned signatures directly from the response text.
-  Do NOT call read_file on any path mentioned in the search result — those paths are inside
-  If flexric_rag_context does not return enough information, you may use `semantic_search_summary` to explore, or `semantic_search_detailed` to see the full code. Use detailed search ONLY when necessary to avoid token limit issues.
+  Do NOT call read_file on any path mentioned in the search result.
+  If semantic_search_summary does not return enough information, you may use `semantic_search_detailed` to see the full code. Use detailed search ONLY when necessary to avoid token limit issues.
 
 STEP 2 — READ TEMPLATE:
   Call `read_file` with filename `flexric_template.py`.
@@ -95,9 +95,10 @@ def _pre_model_hook(state: dict) -> dict:
     Keeps the first message (the task + blueprint) plus the 12 most recent
     messages, dropping the middle to stay inside the model's context window.
     """
-    messages = state.get("messages", [])
+    limited_state = limit_tool_messages(state)
+    messages = limited_state.get("messages", state.get("messages", []))
     if len(messages) <= 14:
-        return {}
+        return {"messages": messages}
     return {"messages": messages[:1] + messages[-12:]}
 
 
@@ -117,7 +118,7 @@ def module_6_integrator_node(state: dict) -> dict:
         f"Integration Context (Technical Mapping + Logic Artifacts):\n"
         f"{json.dumps(integration_context, indent=2)}\n\n"
         f"Execute the 4-step workflow: "
-        f"(1) flexric_rag_context lookup, "
+        f"(1) semantic_search_summary lookup, "
         f"(2) read flexric_template.py, "
         f"(3) write final_xapp.py with all 6 placeholders replaced, "
         f"(4) run `mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log`. "
@@ -125,7 +126,7 @@ def module_6_integrator_node(state: dict) -> dict:
     )
 
     llm = get_llm()
-    module_6_tools = workspace_tools + [flexric_rag_context, semantic_search_summary, semantic_search_detailed]
+    module_6_tools = workspace_tools + [semantic_search_summary, semantic_search_detailed]
 
     integrator_agent = create_react_agent(
         model=llm,

@@ -46,6 +46,7 @@ SM_TYPE_MAP = {
     "rc":  "E2SM_RC",
     "mac": "E2SM_MAC",
     "rlc": "E2SM_RLC",
+    "slice": "E2SM_SLICE",
     "e2ap": "E2AP",
 }
 
@@ -56,7 +57,6 @@ PY_EXTENSIONS = {".py"}
 
 SKIP_DIRS = {
     "build", "cmake", ".git", "CMakeFiles",
-    "test", "tests",
     "ci-scripts",
     "alg_ds",
     "sqlite3",
@@ -149,16 +149,23 @@ def _classify_chunk(rel_path: str, name: str) -> Dict[str, Any]:
     elif INCLUDE_DIR in parts:
         layer = "api"
 
-    # Split path and name into discrete tokens so that "rc" does not
-    # spuriously match "src" (which appears in every file path).
-    path_tokens = set(re.split(r"[^a-zA-Z0-9]", parts))
-    name_tokens = set(re.split(r"[^a-zA-Z0-9]", name.lower()))
-
+    # Dynamic SM detection: if file is in src/sm/<sm_name>_sm, use <sm_name>
     sm_type = "none"
-    for key, val in SM_TYPE_MAP.items():
-        if key in path_tokens or key in name_tokens:
-            sm_type = val
-            break
+    if "src/sm" in parts:
+        # Extract folder name after src/sm/
+        match = re.search(r"src/sm/([^/]+)", parts)
+        if match:
+            sm_folder = match.group(1)
+            # Normalize: e.g. kpm_sm -> KPM, slice_sm -> SLICE
+            sm_type = "E2SM_" + sm_folder.replace("_sm", "").upper()
+    else:
+        # Fallback to keyword matching for files outside src/sm
+        path_tokens = set(re.split(r"[^a-zA-Z0-9]", parts))
+        name_tokens = set(re.split(r"[^a-zA-Z0-9]", name.lower()))
+        for key, val in SM_TYPE_MAP.items():
+            if key in path_tokens or key in name_tokens:
+                sm_type = val
+                break
 
     return {
         "layer": layer,

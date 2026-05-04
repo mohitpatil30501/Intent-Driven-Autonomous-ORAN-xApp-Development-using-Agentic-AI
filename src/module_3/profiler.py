@@ -9,7 +9,8 @@ from langchain_ollama import ChatOllama
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
-from tools.structural_rag.flexric_rag_tool import exact_keyword_search
+from tools.semantic_search.semantic_search_tool import semantic_search_summary
+from tools.context_utils import limit_tool_messages
 from module_3.synthesizer import _finalize_data_paths, get_llm
 
 DATASET_PROFILER_SYSTEM_PROMPT = """You are "Module 3b: The O-RAN Dataset Profiler" in an automated xApp development pipeline.
@@ -24,7 +25,7 @@ the deployed xApp to fail at inference time. Therefore:
   - REQUIRED columns (from Technical_Mapping.Telemetry_Variables[*].C_variable) are already
     FlexRIC-validated by Module 2. Always include these.
   - ADDITIONAL columns (for ML enrichment, Supervised_ML or Unsupervised_ML only) must be
-    verified using exact_keyword_search before inclusion. A column whose name appears in the
+    verified using semantic_search_summary before inclusion. A column whose name appears in the
     FlexRIC codebase (.h or .c file) is FLEXRIC_VALID. All others are EXCLUDED.
   - Administrative columns (IPs, MACs, timestamps, user IDs, sequence numbers, URLs) are NEVER
     included regardless of FlexRIC verification.
@@ -80,12 +81,12 @@ STEP 4 — MATCH REQUIRED COLUMNS (Technical_Mapping → CANDIDATE COLUMN LIST)
 STEP 5 — FLEXRIC-VALIDATE ADDITIONAL COLUMNS (ML only — skip this entire step for Pure_Logic)
   If cycle_Type is Supervised_ML or Unsupervised_ML:
   Take all CANDIDATE COLUMN LIST columns that are NOT already matched as required columns (Step 4).
-  For each additional candidate, call: exact_keyword_search(column_name, max_results=3)
+  For each additional candidate, call: semantic_search_summary(query=column_name, n_results=3)
     - If the result string contains a reference to a .h or .c file → mark as FLEXRIC_VALID.
     - If the result is "No matches found" or references only non-C/H files → mark as EXCLUDED.
   Print a VALIDATION REPORT: {column_name: "FLEXRIC_VALID" | "EXCLUDED"}
 
-  IMPORTANT: Do NOT call exact_keyword_search more than once per unique column name.
+  IMPORTANT: Do NOT call semantic_search_summary more than once per unique column name.
   If the CANDIDATE list has many columns, process them in batches using a Python loop script
   that writes the results to a file, then read that file. This avoids hitting the recursion limit.
 
@@ -190,13 +191,14 @@ def dataset_profiler_node(state: dict) -> dict:
 
     llm = get_llm()
 
-    # exact_keyword_search is needed to validate additional columns against the FlexRIC codebase
-    profiler_tools = workspace_tools + [exact_keyword_search]
+    # semantic_search_summary is needed to validate additional columns against the FlexRIC codebase
+    profiler_tools = workspace_tools + [semantic_search_summary]
 
     profiler_agent = create_react_agent(
         model=llm,
         tools=profiler_tools,
         prompt=DATASET_PROFILER_SYSTEM_PROMPT,
+        pre_model_hook=limit_tool_messages
     )
 
     try:

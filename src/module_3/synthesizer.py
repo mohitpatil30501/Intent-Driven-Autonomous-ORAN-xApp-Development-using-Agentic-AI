@@ -10,6 +10,7 @@ from langchain_ollama import ChatOllama
 # Add the src folder to path so we can import from tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
+from tools.context_utils import limit_tool_messages
 
 MODULE_3_SYSTEM_PROMPT = """You are "Module 3: The O-RAN Data Engineer" in an automated xApp development pipeline.
 Your job is to generate synthetic datasets based on the provided Blueprint and Technical Mapping.
@@ -120,7 +121,8 @@ def module_3_data_node(state: dict) -> dict:
     data_agent = create_react_agent(
         model=llm, 
         tools=workspace_tools, 
-        prompt=MODULE_3_SYSTEM_PROMPT
+        prompt=MODULE_3_SYSTEM_PROMPT,
+        pre_model_hook=limit_tool_messages
     )
     
     try:

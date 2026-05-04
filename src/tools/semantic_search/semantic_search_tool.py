@@ -8,7 +8,7 @@ SEMANTIC_SEARCH_URL = os.getenv("SEMANTIC_SEARCH_URL", "http://localhost:7080")
 def semantic_search_summary(query: str, n_results: int = 5) -> str:
     """
     Search the codebase for semantic meaning (e.g., 'how to update throughput').
-    Returns truncated code snippets to save tokens.
+    Returns full code snippets to provide complete context.
     Use this to get a broad overview of where concepts are implemented.
     """
     try:
@@ -17,8 +17,8 @@ def semantic_search_summary(query: str, n_results: int = 5) -> str:
             json={
                 "query": query, 
                 "n_results": n_results, 
-                "truncate_chars": 800,
-                "return_full_text": False
+                "truncate_chars": 0,
+                "return_full_text": True
             },
             timeout=30
         )
@@ -34,7 +34,7 @@ def semantic_search_detailed(query: str, n_results: int = 2) -> str:
     Search the codebase for semantic meaning and return the FULL code bodies.
     WARNING: This consumes a lot of tokens. Use ONLY when you specifically need
     to see the complete implementation details of a function you found using
-    semantic_search_summary or structural_rag. Limit n_results to 1 or 2.
+    semantic_search_summary. Limit n_results to 1 or 2.
     """
     try:
         res = requests.post(
