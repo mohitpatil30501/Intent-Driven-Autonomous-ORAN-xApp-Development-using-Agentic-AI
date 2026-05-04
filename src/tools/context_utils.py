@@ -54,7 +54,7 @@ def limit_tool_messages(agent_state: dict) -> dict:
             else:
                 # Used tool message. Truncate entirely.
                 kwargs = {
-                    "content": "[Output truncated to maintain context window. Please use subsequent tool calls if needed.]",
+                    "content": "[Output truncated to maintain context window.]",
                     "tool_call_id": tool_call_id,
                     "name": m.name,
                     "status": getattr(m, "status", "success")
@@ -66,3 +66,18 @@ def limit_tool_messages(agent_state: dict) -> dict:
             filtered.append(m)
             
     return {"messages": filtered}
+
+def limit_context_window(agent_state: dict, max_messages: int = 14) -> dict:
+    """
+    Combines tool message truncation with a sliding window for the conversation.
+    Keeps the first message (usually the task) and the N most recent messages.
+    """
+    # First, truncate large/old tool outputs
+    limited_state = limit_tool_messages(agent_state)
+    messages = limited_state.get("messages", [])
+    
+    if len(messages) <= max_messages:
+        return {"messages": messages}
+    
+    # Keep the first message (System or initial Human) and the last N-1 messages
+    return {"messages": [messages[0]] + messages[-(max_messages-1):]}

@@ -2,6 +2,7 @@ import json
 import re
 import os
 import sys
+import copy
 from typing import Any, Dict
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -10,7 +11,7 @@ from langchain_ollama import ChatOllama
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
 from tools.semantic_search.semantic_search_tool import semantic_search_summary
-from tools.context_utils import limit_tool_messages
+from tools.context_utils import limit_context_window
 
 DATA_ENGINEER_SYSTEM_PROMPT = """You are "Module 3: The O-RAN Data Engineer" in an automated xApp development pipeline.
 Your job is to provide the necessary datasets based on the provided Blueprint, Technical Mapping, and the User's Data Availability.
@@ -19,37 +20,44 @@ The user may want to use an existing dataset for all data, synthesize all data, 
 
 CRITICAL RULE — RAN-REPORTABLE COLUMNS ONLY:
 An xApp deployed on a real RAN can ONLY receive metrics that FlexRIC can actually report.
-- REQUIRED columns (from Technical_Mapping.Telemetry_Variables[*].C_variable) are already FlexRIC-validated.
+- REQUIRED columns (from the leaf nodes of `Technical_Mapping.Telemetry_Variables`) are already FlexRIC-validated.
 - ADDITIONAL columns from an existing dataset must be verified using `semantic_search_summary` before inclusion. A column whose name appears in the FlexRIC codebase (.h or .c file) is FLEXRIC_VALID. All others are EXCLUDED.
 - Administrative columns (IPs, MACs, timestamps, user IDs, URLs) are NEVER included.
+
+CRITICAL RULE — MINIMAL TOOL USAGE:
+Do NOT use tools unnecessarily. Rely entirely on the Blueprint and Technical Mapping provided in your prompt. Use tools ONLY when absolutely necessary (e.g., reading user-provided dataset directories or writing output files). If the user requests purely synthetic data, skip dataset discovery and just write the generation script.
+
+CRITICAL RULE — REALISTIC DATA SYNTHESIS:
+Do NOT generate completely random noise (e.g., plain `np.random.rand()`). Synthesized data MUST exhibit consistency and logical relationships between parameters that reflect the `Intent_Blueprint.objective_Why` or `goal`. For example, if the objective is anomaly detection or load balancing, generate baseline normal traffic patterns with distinct, correlated events (e.g., when throughput drops, latency and buffer occupancy rise). Use mathematical functions (sine waves, trending slopes, correlated variables) to build a realistic scenario.
 
 --- STRICT WORKFLOW INSTRUCTIONS ---
 Execute the following steps IN ORDER using your tools.
 
 STEP 1: ANALYZE USER INPUT & REQUIREMENTS
 - Read the "User Data Availability" string to understand what data needs to be synthetic and what is provided as paths.
-- Note `Intent_Blueprint.cycle_Type`. If "Pure_Logic", ONLY `data/streaming_mock_data.csv` is needed. If "Supervised_ML" or "Unsupervised_ML", you ALSO need `data/historical_training_data.csv` and `data/test_data.csv`.
+- Note `Intent_Blueprint.cycle_Type`. If "Pure_Logic", ONLY `data/streaming_mock_data.json` is needed. If "Supervised_ML" or "Unsupervised_ML", you ALSO need `data/historical_training_data.csv` and `data/test_data.csv`.
 
 STEP 2: DISCOVER & PROFILE PROVIDED DATASETS (If any user paths are provided)
 - Discover files in the provided path(s).
 - Load headers only.
 - Write and execute a python script (`data/pre_filter.py`) to pre-filter columns (drop object dtypes, admin/timestamp columns, zero-variance columns).
-- Match the surviving columns to the required `C_variable` columns.
+- Match the surviving columns to the required leaf node names extracted from `Technical_Mapping.Telemetry_Variables`.
 - For ML datasets, use `semantic_search_summary` to FlexRIC-validate any remaining unmatched columns.
 
 STEP 3: GENERATE / MERGE DATAFRAMES
-- Write a python script `data/build_datasets.py`. This script MUST:
-  a. Load provided datasets (if any) and select ONLY the matched required columns and FLEXRIC_VALID columns. Rename them to their exact `C_variable` names.
-  b. Synthesize any missing required `C_variable` columns (e.g., if the user provided ML data but it lacks a required column, synthesize it using np.random).
-  c. If the user wants SYNTHETIC streaming data, generate a completely new dataframe of 100-500 rows for `data/streaming_mock_data.csv`. If they want to use an existing dataset for streaming, split off 100-500 rows from it.
+- Write a python script `data/build_streaming_datasets.py` (using pandas, numpy, and json). You MUST use the `write_file` tool to create this script on disk. Do NOT try to run inline python scripts or heredocs (`python -c` or `python - << 'EOF'`) using the `terminal_command` tool. This script MUST:
+  a. Load provided datasets (if any) and select ONLY the matched required columns and FLEXRIC_VALID columns. Rename them to their exact leaf node names.
+  b. Synthesize any missing required leaf nodes using correlated, mathematically sound patterns (NOT purely random) based on the xApp objective.
+  c. For SYNTHETIC streaming data, generate a JSON file `data/streaming_mock_data.json` with 100-500 items. It MUST be a JSON array `[ {"timestamp": 1600000000, "data": { <Module 2 Telemetry_Variables schema> }}, ... ]`. If they want to use an existing dataset for streaming, you must convert the relevant flat CSV rows into this exact hierarchical JSON structure by mapping the column values to the corresponding leaf nodes in the schema.
   d. If ML is required and the user wants SYNTHETIC ML data, generate 5000 rows for `data/historical_training_data.csv` and 1000 rows for `data/test_data.csv` using numpy vectorization.
-  e. If ML is required and the user provided an ML dataset, split the loaded/validated dataset into training (80%) and testing (20%). If `streaming_mock_data.csv` is also derived from here, allocate 5-10% to streaming.
-  f. Save all required CSVs to `data/`.
+  e. If ML is required and the user provided an ML dataset, split the loaded/validated dataset into training (80%) and testing (20%).
+  f. Save the required files to `data/`.
 
-STEP 4: CROSS-VALIDATE EVERY OUTPUT CSV
-- For every CSV written in Step 3, run a Python one-liner to print shape and head(3).
+STEP 4: CROSS-VALIDATE EVERY OUTPUT FILE
+- For the CSVs written in Step 3, run a Python one-liner to print shape and head(3).
+- For the streaming JSON, run a one-liner to print its length and first 2 items.
 - Mandatory checks:
-  - All required `C_variable` columns are present.
+  - All required leaf node columns are present in the datasets (prior to JSON restructuring).
   - No column is all-zero or constant.
   - If Supervised_ML, ensure a label column exists in both training and test CSVs.
   - If the script fails or data is incorrect, rewrite and re-run.
@@ -67,7 +75,7 @@ ONLY after successfully verifying EVERY output CSV, output a final JSON block:
 ```json
 {
   "Data_Paths": {
-    "streaming_mock_data_path": "data/streaming_mock_data.csv",
+    "streaming_mock_data_path": "data/streaming_mock_data.json",
     "historical_training_data_path": "data/historical_training_data.csv", // or null if Pure_Logic
     "test_data_path": "data/test_data.csv", // or null if Pure_Logic
     "test_label_column": "label", // or null
@@ -85,7 +93,7 @@ def get_llm():
 
 def _finalize_data_paths(data_paths: Dict[str, Any], blueprint: Dict[str, Any]) -> Dict[str, Any]:
     cycle_type = blueprint.get("Intent_Blueprint", {}).get("cycle_Type", "Pure_Logic")
-    data_paths.setdefault("streaming_mock_data_path", "data/streaming_mock_data.csv")
+    data_paths.setdefault("streaming_mock_data_path", "data/streaming_mock_data.json")
 
     if cycle_type in ["Supervised_ML", "Unsupervised_ML"]:
         data_paths.setdefault("historical_training_data_path", "data/historical_training_data.csv")
@@ -113,14 +121,23 @@ def _finalize_data_paths(data_paths: Dict[str, Any], blueprint: Dict[str, Any]) 
     return data_paths
 
 
+def _extract_data_context(blueprint: dict) -> dict:
+    """Return only the fields needed for data engineering."""
+    return {
+        "Intent_Blueprint": blueprint.get("Intent_Blueprint", {}),
+        "Technical_Mapping": blueprint.get("Technical_Mapping", {})
+    }
+
 def module_3_data_node(state: dict) -> dict:
     """Module 3: Unified Data Engineer handling synthetic, profiled, and mixed datasets."""
-    blueprint = state.get("blueprint", {})
+    blueprint = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
     user_input = state.get("user_dataset_input", "")
+
+    data_context = _extract_data_context(blueprint)
 
     prompt_content = (
         f"Here is the complete Blueprint and Technical Mapping:\n"
-        f"{json.dumps(blueprint, indent=2)}\n\n"
+        f"{json.dumps(data_context, indent=2)}\n\n"
         f"User Data Availability:\n"
         f"`{user_input}`\n\n"
         f"Execute all steps: analyze, discover/profile (if paths provided), generate/merge, cross-validate, "
@@ -136,7 +153,7 @@ def module_3_data_node(state: dict) -> dict:
         model=llm,
         tools=data_tools,
         prompt=DATA_ENGINEER_SYSTEM_PROMPT,
-        pre_model_hook=limit_tool_messages
+        pre_model_hook=limit_context_window
     )
 
     try:
@@ -161,7 +178,11 @@ def module_3_data_node(state: dict) -> dict:
         except json.JSONDecodeError:
             print("Failed to parse JSON from Data Engineer output.")
 
+    # Return a summary to keep main state clean
+    profile = data_paths.get("training_data_profile", "unknown")
+    summary = f"Module 3: Data engineering complete. Profile: {profile}. Paths saved to blueprint."
+
     return {
         "blueprint": blueprint,
-        "messages": [AIMessage(content=final_text)],
+        "messages": [AIMessage(content=summary)],
     }

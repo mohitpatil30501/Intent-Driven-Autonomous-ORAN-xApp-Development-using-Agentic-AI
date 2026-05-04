@@ -22,7 +22,7 @@ CRITICAL RULE — RAN-REPORTABLE COLUMNS ONLY:
 An xApp deployed on a real RAN (srsRAN via FlexRIC service models) can ONLY receive metrics that
 FlexRIC can actually report. Training an ML model on columns that FlexRIC cannot report will cause
 the deployed xApp to fail at inference time. Therefore:
-  - REQUIRED columns (from Technical_Mapping.Telemetry_Variables[*].C_variable) are already
+  - REQUIRED columns (from the leaf nodes of Technical_Mapping.Telemetry_Variables) are already
     FlexRIC-validated by Module 2. Always include these.
   - ADDITIONAL columns (for ML enrichment, Supervised_ML or Unsupervised_ML only) must be
     verified using semantic_search_summary before inclusion. A column whose name appears in the
@@ -66,8 +66,8 @@ STEP 3 — PYTHON PRE-FILTER (critical for datasets with 100+ columns — do NOT
   The output of this step is the CANDIDATE COLUMN LIST. LLM reasoning (Steps 4-5) only applies to this list.
 
 STEP 4 — MATCH REQUIRED COLUMNS (Technical_Mapping → CANDIDATE COLUMN LIST)
-  Required variables: Technical_Mapping.Telemetry_Variables[*].C_variable
-  For EACH required C_variable, search the CANDIDATE COLUMN LIST in priority order:
+  Required variables: Extract the leaf nodes from the hierarchical JSON object in Technical_Mapping.Telemetry_Variables.
+  For EACH required leaf node (e.g., if the schema has `{"slices": [{"id": "uint32_t"}]}`, the leaf is `id`), search the CANDIDATE COLUMN LIST in priority order:
     Priority 1 — Exact match (case-sensitive string equality)
     Priority 2 — Case-insensitive match (lower() comparison)
     Priority 3 — Normalized match: replace hyphens, spaces, dots with underscores, then compare lowercase
@@ -76,7 +76,7 @@ STEP 4 — MATCH REQUIRED COLUMNS (Technical_Mapping → CANDIDATE COLUMN LIST)
                  Document your reasoning explicitly.
     Priority 5 — MISSING: not found in the CANDIDATE list. Record as missing; will be synthesized in Step 7.
   Print a MATCH REPORT dict:
-    {c_variable: {status: "exact|case|normalized|semantic|missing", source_col: "...", file: "...", confidence: "high|N/A"}}
+    {leaf_node_name: {status: "exact|case|normalized|semantic|missing", source_col: "...", file: "...", confidence: "high|N/A"}}
 
 STEP 5 — FLEXRIC-VALIDATE ADDITIONAL COLUMNS (ML only — skip this entire step for Pure_Logic)
   If cycle_Type is Supervised_ML or Unsupervised_ML:
@@ -96,8 +96,8 @@ STEP 6 — COUNT ROWS and DETERMINE SPLIT STRATEGY
 
   Split strategy based on Intent_Blueprint.cycle_Type and TOTAL rows across contributing files:
 
-  Pure_Logic → only data/streaming_mock_data.csv is needed (100–500 rows)
-    Use the file with the most matched required columns. If >500 rows, randomly sample 300 rows.
+  Pure_Logic → only data/streaming_mock_data.json is needed (100–500 items)
+    Use the file with the most matched required columns. If >500 rows, randomly sample 300 rows and convert to the hierarchical JSON format.
 
   Supervised_ML / Unsupervised_ML → three output files needed:
     Total rows < 1 000  → 70% training / 20% test / 10% streaming (cap streaming at 500)
@@ -115,33 +115,35 @@ STEP 7 — BUILD MERGED DATAFRAME
   i.   Load ONLY the matched + FLEXRIC_VALID columns from source file(s) using usecols= parameter
        to avoid loading the full 280 columns:
          pd.read_csv('<file>', usecols=[list_of_needed_source_columns])
-  ii.  Rename matched source columns to their exact C_variable names:
-         df.rename(columns={"source_col_name": "c_variable_name"}, inplace=True)
+  ii.  Rename matched source columns to their exact leaf node names:
+         df.rename(columns={"source_col_name": "leaf_node_name"}, inplace=True)
   iii. For EACH required column with status "missing" (from Step 4), synthesize realistic values:
          uint64_t byte counters   → np.random.randint(1_000_000, 100_000_000, size=n)
          uint32_t (PRB / ratios)  → np.random.randint(0, 100, size=n)
          float                    → np.random.uniform(0.0, 1.0, size=n)
        Print: "WARNING: Synthesizing column '<col>' — not found in user dataset."
   iv.  Include all FLEXRIC_VALID additional columns alongside the required ones (ML only).
-  v.   Drop ALL other columns. Final DataFrame = required C_variables + FLEXRIC_VALID + label (if present).
+  v.   Drop ALL other columns. Final DataFrame = required leaf nodes + FLEXRIC_VALID + label (if present).
   vi.  Split into output DataFrames per Step 6 strategy using pandas sample() with random_state=42.
   vii. Write splits to workspace (all paths relative to workspace root):
-         data/streaming_mock_data.csv        (always)
-         data/historical_training_data.csv   (ML only)
-         data/test_data.csv                  (ML only)
+         - For `data/streaming_mock_data.json` (always): Iterate over the rows of the streaming split and construct a JSON list. Each row must be converted into the hierarchical JSON structure defined by `Technical_Mapping.Telemetry_Variables` using the row's values for the leaf nodes, wrapped with a `"timestamp"` key.
+         - For `data/historical_training_data.csv` (ML only): Write to CSV directly.
+         - For `data/test_data.csv` (ML only): Write to CSV directly.
   viii.Print shape and head(3) for every output file.
   Execute: python3 data/profile_and_merge.py
   Fix and re-run if it crashes.
 
-STEP 8 — CROSS-VALIDATE EVERY OUTPUT CSV
+STEP 8 — CROSS-VALIDATE EVERY OUTPUT FILE
   For every CSV written in Step 7, run:
     python3 -c "import pandas as pd; df=pd.read_csv('data/<FILE>'); print(df.shape, df.columns.tolist(), df.head(3))"
+  For the JSON file written in Step 7, run:
+    python3 -c "import json; d=json.load(open('data/streaming_mock_data.json')); print(len(d), d[:2])"
   Mandatory checks:
-    - All required C_variable columns are present and contain no entirely-NaN column.
+    - All required leaf node columns are present in ML datasets.
     - No column is all-zero or constant.
     - Supervised_ML: label column exists in BOTH training and test CSVs.
     - Unsupervised_ML: if source had a label column, it exists in test CSV; otherwise note absence.
-    - Row counts match the intended split within 5% tolerance.
+    - Row/item counts match the intended split within 5% tolerance.
   Fix profile_and_merge.py and re-run if any check fails.
 
 STEP 9 — DETERMINE training_data_profile
@@ -158,7 +160,7 @@ ONLY after successfully verifying EVERY output CSV in Step 8, output a final JSO
 ```json
 {
   "Data_Paths": {
-    "streaming_mock_data_path": "data/streaming_mock_data.csv",
+    "streaming_mock_data_path": "data/streaming_mock_data.json",
     "historical_training_data_path": "data/historical_training_data.csv",
     "test_data_path": "data/test_data.csv",
     "test_label_column": "label",

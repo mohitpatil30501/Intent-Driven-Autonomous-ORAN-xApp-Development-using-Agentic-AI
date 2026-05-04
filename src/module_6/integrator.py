@@ -2,6 +2,7 @@ import json
 import re
 import os
 import sys
+import copy
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_ollama import ChatOllama
@@ -12,7 +13,7 @@ from tools.semantic_search.semantic_search_tool import (
     semantic_search_summary,
     semantic_search_detailed,
 )
-from tools.context_utils import limit_tool_messages
+from tools.context_utils import limit_context_window
 
 MODULE_6_SYSTEM_PROMPT = """You are "Module 6: The xApp Integrator" in an automated O-RAN development pipeline.
 Your ONLY job is to inject the standalone logic created by Module 5 into a deployable FlexRIC xApp.
@@ -90,16 +91,8 @@ def _extract_integration_context(blueprint: dict) -> dict:
 
 
 def _pre_model_hook(state: dict) -> dict:
-    """Trim old messages before each model call to prevent context explosion.
-
-    Keeps the first message (the task + blueprint) plus the 12 most recent
-    messages, dropping the middle to stay inside the model's context window.
-    """
-    limited_state = limit_tool_messages(state)
-    messages = limited_state.get("messages", state.get("messages", []))
-    if len(messages) <= 14:
-        return {"messages": messages}
-    return {"messages": messages[:1] + messages[-12:]}
+    """Trim old messages before each model call to prevent context explosion."""
+    return limit_context_window(state, max_messages=14)
 
 
 def get_llm():
@@ -111,7 +104,7 @@ def get_llm():
 def module_6_integrator_node(state: dict) -> dict:
     """Module 6: Wraps the core logic into the FlexRIC Python Template."""
 
-    blueprint = state.get("blueprint", {})
+    blueprint = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
     integration_context = _extract_integration_context(blueprint)
 
     prompt_content = (
@@ -178,8 +171,12 @@ def module_6_integrator_node(state: dict) -> dict:
         except json.JSONDecodeError:
             print("Failed to parse JSON from Module 6 output.")
 
+    # Return a summary to keep main state clean
+    xapp_path = deployment_status.get("xapp_path", "workspace/final_xapp.py")
+    summary = f"Module 6: Integration successful. Final xApp saved to {xapp_path}."
+
     return {
         "blueprint": blueprint,
-        "messages": [AIMessage(content=final_text)],
+        "messages": [AIMessage(content=summary)],
         "is_complete": True
     }

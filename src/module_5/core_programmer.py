@@ -2,6 +2,7 @@ import json
 import re
 import os
 import sys
+import copy
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 from langchain_ollama import ChatOllama
@@ -9,7 +10,7 @@ from langchain_ollama import ChatOllama
 # Add the src folder to path so we can import from tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
-from tools.context_utils import limit_tool_messages
+from tools.context_utils import limit_context_window
 
 MODULE_5_SYSTEM_PROMPT = """You are "Module 5: The Core Programmer" in an automated xApp development pipeline.
 Your ONLY job is to write the standalone algorithmic brain of the xApp.
@@ -30,9 +31,9 @@ You must use your tools to execute the following steps in order:
    - `process_interval` MUST return a dictionary matching an action from the `Action_Space_Menu` (e.g., `{"action_id": "UPDATE_SLICE_PRB", "parameters": {"slice_id": 1, "prb_ratio": 80}}`).
    
 3. WRITE TEST LOOP: At the bottom of `logic/core_logic.py`, write an `if __name__ == '__main__':` block that:
-   - Loads `Data_Paths.streaming_mock_data_path` using pandas.
+   - Loads `Data_Paths.streaming_mock_data_path` using the `json` module.
    - Instantiates `XAppLogic()`.
-   - Iterates through the CSV row by row, converting each row to a dictionary, and passes it to `process_interval()`.
+   - Iterates through the JSON array, and passes the entire object (or its `data` payload depending on how your process_interval expects it) to `process_interval()`.
    - Prints the output decisions.
 
 4. EXECUTE SCRIPT: Run `python3 logic/core_logic.py`. If it crashes (e.g., KeyError, model shape mismatch), read the terminal error, fix the script, and run it again.
@@ -57,13 +58,23 @@ def get_llm():
     ollama_model = os.getenv("OLLAMA_MODEL", "llama3.1")
     return ChatOllama(model=ollama_model, base_url=ollama_url)
 
+def _extract_logic_context(blueprint: dict) -> dict:
+    """Return only the fields needed for logic programming."""
+    return {
+        "Intent_Blueprint": blueprint.get("Intent_Blueprint", {}),
+        "Technical_Mapping": blueprint.get("Technical_Mapping", {}),
+        "Data_Paths": blueprint.get("Data_Paths", {}),
+        "ML_Model_Artifacts": blueprint.get("ML_Model_Artifacts", {})
+    }
+
 def module_5_logic_dev_node(state: dict) -> dict:
     """Module 5: Writes and tests the independent Python logic class."""
     
-    blueprint = state.get("blueprint", {})
+    blueprint = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
+    logic_context = _extract_logic_context(blueprint)
     prompt_content = (
         f"Here is the complete Blueprint, including Technical Mapping, Data Paths, and ML Artifacts:\n"
-        f"{json.dumps(blueprint, indent=2)}\n\n"
+        f"{json.dumps(logic_context, indent=2)}\n\n"
         f"Create the `logic/` directory in the workspace, write `core_logic.py`, write the testing loop, "
         f"and execute it by giving the streaming mock dataset from the data directory as input to ensure it processes the mock data without errors. Finally, return the Logic_Artifacts JSON.\n"
         f"IMPORTANT: Create a `log/` directory in the workspace and save the terminal output of your script execution (the test loop) to `log/module_5_logic.log` using your tools."
@@ -76,7 +87,7 @@ def module_5_logic_dev_node(state: dict) -> dict:
         model=llm, 
         tools=workspace_tools, 
         prompt=MODULE_5_SYSTEM_PROMPT,
-        pre_model_hook=limit_tool_messages
+        pre_model_hook=limit_context_window
     )
     
     try:
@@ -104,7 +115,11 @@ def module_5_logic_dev_node(state: dict) -> dict:
             print("Failed to parse JSON from Module 5 output.")
             pass
 
+    # Return a summary to keep main state clean
+    script_path = blueprint.get("Logic_Artifacts", {}).get("logic_script_path", "logic/core_logic.py")
+    summary = f"Module 5: Core logic generation and verification complete. Script saved to {script_path}."
+
     return {
         "blueprint": blueprint,
-        "messages": [AIMessage(content=final_text)]
+        "messages": [AIMessage(content=summary)]
     }

@@ -2,6 +2,7 @@ import json
 import re
 import os
 import sys
+import copy
 from typing import Any, Dict
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
@@ -10,7 +11,7 @@ from langchain_ollama import ChatOllama
 # Add the src folder to path so we can import from tools
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools, WORKSPACE_DIR
-from tools.context_utils import limit_tool_messages
+from tools.context_utils import limit_context_window
 
 DEFAULT_ACCEPTANCE_THRESHOLD = 0.85
 DEFAULT_METRIC_POLICY = "task_aware"
@@ -192,10 +193,19 @@ def _recover_artifacts_from_workspace(blueprint: Dict[str, Any]) -> Dict[str, An
         print(f"Module 4: artifact recovery failed: {e}")
     return blueprint
 
+def _extract_ml_context(blueprint: dict) -> dict:
+    """Return only the fields needed for ML training."""
+    return {
+        "Intent_Blueprint": blueprint.get("Intent_Blueprint", {}),
+        "Technical_Mapping": blueprint.get("Technical_Mapping", {}),
+        "Data_Paths": blueprint.get("Data_Paths", {})
+    }
+
 def module_4_ml_dev_node(state: dict) -> dict:
     """Module 4: Trains an ML model and saves the artifact."""
 
-    blueprint = ensure_model_acceptance_defaults(state.get("blueprint", {}))
+    blueprint_state = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
+    blueprint = ensure_model_acceptance_defaults(blueprint_state)
 
     data_paths = blueprint.get("Data_Paths", {})
     hist_data = data_paths.get("historical_training_data_path", "data/historical_training_data.csv")
@@ -205,8 +215,10 @@ def module_4_ml_dev_node(state: dict) -> dict:
     metric_policy = criteria.get("metric_policy", DEFAULT_METRIC_POLICY)
     max_attempts = _get_max_training_attempts()
 
+    ml_context = _extract_ml_context(blueprint)
+
     prompt_content = (
-        f"Here is the complete Blueprint:\n{json.dumps(blueprint, indent=2)}\n\n"
+        f"Here is the complete Blueprint:\n{json.dumps(ml_context, indent=2)}\n\n"
         f"Training data: `{hist_data}` | Test data: `{test_data}`\n"
         f"Acceptance threshold: `{threshold}` | Metric policy: `{metric_policy}` | Max attempts: `{max_attempts}`\n\n"
         f"Follow the workflow: create ml/ dir, explore data in ONE combined one-liner, write ml/train.py "
@@ -216,7 +228,7 @@ def module_4_ml_dev_node(state: dict) -> dict:
     )
 
     llm = get_llm()
-    ml_agent = create_react_agent(model=llm, tools=workspace_tools, prompt=MODULE_4_SYSTEM_PROMPT, pre_model_hook=limit_tool_messages)
+    ml_agent = create_react_agent(model=llm, tools=workspace_tools, prompt=MODULE_4_SYSTEM_PROMPT, pre_model_hook=limit_context_window)
 
     final_text = ""
     try:
@@ -252,7 +264,12 @@ def module_4_ml_dev_node(state: dict) -> dict:
         print("Module 4: no JSON block in agent output, recovering from workspace.")
         blueprint = _recover_artifacts_from_workspace(blueprint)
 
+    # Return a summary to keep main state clean
+    met = blueprint.get("ML_Model_Artifacts", {}).get("threshold_met", False)
+    val = blueprint.get("ML_Model_Artifacts", {}).get("best_metric_value", 0)
+    summary = f"Module 4: ML Training complete. Threshold met: {met} (Metric: {val:.3f})."
+
     return {
         "blueprint": blueprint,
-        "messages": [AIMessage(content=final_text)]
+        "messages": [AIMessage(content=summary)]
     }

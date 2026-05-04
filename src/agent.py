@@ -32,13 +32,14 @@ def ask_dataset(state: AgentState) -> dict:
     Appends a question asking whether the user has an existing dataset.
     Graph pauses BEFORE receive_dataset so the user can type a path or 'no'.
     """
-    telemetry = state.get("blueprint", {}).get("Technical_Mapping", {}).get("Telemetry_Variables", [])
-    cols = [v.get("C_variable", "?") for v in telemetry]
+    import json
+    telemetry = state.get("blueprint", {}).get("Technical_Mapping", {}).get("Telemetry_Variables", {})
+    schema_str = json.dumps(telemetry, indent=2)
     return {
         "messages": [AIMessage(
             content=(
                 "Technical mapping is complete.\n"
-                f"Required RAN telemetry columns (FlexRIC-validated): {cols}\n\n"
+                f"Required RAN telemetry schema (FlexRIC-validated):\n{schema_str}\n\n"
                 "Please specify your data availability. You can provide existing datasets or request synthetic generation.\n"
                 "Examples:\n"
                 "  • 'Generate all synthetic data' (or 'no')\n"
@@ -133,7 +134,7 @@ builder.add_conditional_edges(
 
 # After technical_mapper, ask the user about an existing dataset
 
-# builder.add_edge("technical_mapper", "ask_dataset")
+builder.add_edge("technical_mapper", "ask_dataset")
 
 builder.add_edge("ask_dataset", "receive_dataset")
 

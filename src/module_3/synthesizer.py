@@ -19,14 +19,15 @@ Your job is to generate synthetic datasets based on the provided Blueprint and T
 You must use your provided tools to execute the following steps in order:
 
 1. CREATE DIRECTORY: Create a folder named `data/` inside the workspace.
-2. WRITE SCRIPT: Write a Python script (e.g., `data/generate_data.py`) using `pandas` and `numpy`.
-   - Look at `Technical_Mapping.Telemetry_Variables`. The `C_variable` values MUST be the exact column headers in your generated CSV files.
+2. WRITE SCRIPT: Write a Python script (e.g., `data/generate_data.py`) using `json` and python dictionaries. You MUST use the `write_file` tool to create this script on disk. Do NOT try to run inline python scripts or heredocs (`python -c` or `python - << 'EOF'`) using the `terminal_command` tool.
+   - Look at `Technical_Mapping.Telemetry_Variables`. Your generated streaming JSON objects MUST EXACTLY match this hierarchical structure.
+   - Each item in the JSON array must be an object containing a `timestamp` and the telemetry object schema from Module 2.
    - Look at `Intent_Blueprint.data_Requirements` for the math/logic needed to simulate anomalies or traffic spikes.
    - If ML is used, the script MUST generate a separate `data/test_data.csv` for model evaluation.
    - If labels are needed for evaluation, use a column named `label` where 0 means normal/no-action behavior and 1 means anomaly/positive-action behavior.
 3. EXECUTE SCRIPT: Run the script using your terminal_command tool (e.g., `python3 data/generate_data.py`).
-4. CROSS-CHECK (MANDATORY): You MUST verify the data. Run commands or Python one-liners to view the headers and first 5 rows for every generated CSV.
-   - Verify that the headers exactly match the required C-struct variables.
+4. CROSS-CHECK (MANDATORY): You MUST verify the data. Run commands or Python one-liners to view the first 2 JSON items.
+   - Verify that the JSON structure exactly matches the required hierarchical schema.
    - For ML datasets, verify that `data/test_data.csv` exists and contains representative evaluation rows.
    - For labeled evaluation, verify that the `label` column contains at least two classes when possible.
    - Verify that the data values make mathematical sense based on the requirements.
@@ -35,11 +36,11 @@ You must use your provided tools to execute the following steps in order:
 --- WHAT TO GENERATE ---
 Check `Intent_Blueprint.cycle_Type`. 
 If it is "Pure_Logic":
-- Generate ONLY `data/streaming_mock_data.csv` (approx 100-500 rows).
+- Generate ONLY `data/streaming_mock_data.json` (approx 100-500 items). It must be a JSON array: `[ {"timestamp": 1600000000, "data": { <Telemetry_Variables structure> }}, ... ]`.
 - Do NOT generate model training or test data. Return null for ML-only paths.
 
 If it is "Supervised_ML" or "Unsupervised_ML":
-- Generate `data/streaming_mock_data.csv` (100-500 rows, no label column).
+- Generate `data/streaming_mock_data.json` (100-500 items) formatted the same way.
 - AND Generate `data/historical_training_data.csv` (EXACTLY 5000 rows) based on the `historical_data_description_NL`. Use numpy to generate all 5000 rows in one vectorized call — do NOT use a Python loop. Include a 'label' column if Supervised_ML. Balance classes: ~50% label=0, ~50% label=1 for Supervised_ML.
 - AND Generate `data/test_data.csv` (EXACTLY 1000 rows) for model evaluation. Include 'label' for Supervised_ML.
 - IMPORTANT: Use numpy vectorized generation (np.random.randint, np.random.uniform, np.where) for ALL rows in a single script — NOT row-by-row loops. The script must complete in under 10 seconds.
@@ -57,7 +58,7 @@ For verification, use oneliner python script to read csv's first 5 row and its h
 ```json
 {
   "Data_Paths": {
-    "streaming_mock_data_path": "data/streaming_mock_data.csv",
+    "streaming_mock_data_path": "data/streaming_mock_data.json",
     "historical_training_data_path": "data/historical_training_data.csv", // or null if Pure_Logic
     "test_data_path": "data/test_data.csv", // or null if Pure_Logic
     "test_label_column": "label", // or null if no labels exist
@@ -74,7 +75,7 @@ def get_llm():
 
 def _finalize_data_paths(data_paths: Dict[str, Any], blueprint: Dict[str, Any]) -> Dict[str, Any]:
     cycle_type = blueprint.get("Intent_Blueprint", {}).get("cycle_Type", "Pure_Logic")
-    data_paths.setdefault("streaming_mock_data_path", "data/streaming_mock_data.csv")
+    data_paths.setdefault("streaming_mock_data_path", "data/streaming_mock_data.json")
 
     if cycle_type in ["Supervised_ML", "Unsupervised_ML"]:
         data_paths.setdefault("historical_training_data_path", "data/historical_training_data.csv")

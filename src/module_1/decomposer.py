@@ -1,11 +1,16 @@
 import json
 import re
 import os
+import copy
 from typing import Any, Dict
 from langchain_core.messages import SystemMessage, AIMessage
 from langchain_ollama import ChatOllama
 from langchain_core.runnables.config import RunnableConfig
 from dotenv import load_dotenv
+
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from tools.context_utils import limit_context_window
 
 load_dotenv("src/.env")
 
@@ -88,17 +93,25 @@ def decomposer_node(state: dict, config: RunnableConfig) -> dict:
     if not messages or not isinstance(messages[0], SystemMessage):
         messages = [SystemMessage(content=DECOMPOSER_PROMPT)] + messages
         
+    # Limit context window to prevent slowdowns
+    limited_state = limit_context_window({"messages": messages}, max_messages=14)
+    messages = limited_state["messages"]
+
     response = llm.invoke(messages, config)
     
     # Parse out the JSON
     parsed_json = extract_json(response.content)
     
     is_complete = False
+    new_blueprint = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
+    
     if parsed_json:
         is_complete = parsed_json.get("Intent_Blueprint", {}).get("validation", {}).get("isComplete", False)
+        if "Intent_Blueprint" in parsed_json:
+            new_blueprint["Intent_Blueprint"] = parsed_json["Intent_Blueprint"]
         
     return {
         "messages": [response],
-        "blueprint": parsed_json,
+        "blueprint": new_blueprint,
         "is_complete": is_complete
     }
