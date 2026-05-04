@@ -1,0 +1,53 @@
+services:
+    
+    flexric:
+        # image:  ${REGISTRY:-oaisoftwarealliance}/oai-flexric:${FLEXRIC_TAG:-develop}
+        build:
+            context: .
+            dockerfile: Dockerfile.flexric
+        container_name: flexric
+        privileged: true
+        environment:
+            - XAPP_DURATION=2000000000 # 20s is a default value
+        volumes:
+            - ./conf/flexric.conf:/usr/local/etc/flexric/flexric.conf
+        ports:
+            - "36421:36421/sctp" # E2 Interface
+        networks:
+            core_network:
+                ipv4_address: 192.168.0.20
+        healthcheck:
+            test: /bin/bash -c "pgrep flexric"
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    xapp:
+        # image: ${REGISTRY:-oaisoftwarealliance}/oai-flexric:${FLEXRIC_TAG:-develop}
+        build:
+            context: .
+            dockerfile: Dockerfile.xapp
+        container_name: xapp
+        environment:
+            - XAPP_DURATION=20 # 20s is a default value
+        depends_on:
+            - flexric
+        networks:
+            core_network:
+                ipv4_address: 192.168.0.21
+                interface_name: eth0
+            inter_net:
+                ipv4_address: 192.168.1.21
+                interface_name: eth1
+        volumes:
+            - ./conf/flexric.conf:/usr/local/etc/flexric/flexric.conf
+        healthcheck:
+            test: ["CMD", "/bin/bash", "/opt/healthcheck.sh"]
+            interval: 10s
+
+networks:
+    core_network:
+        external: true
+    
+    inter_net:
+        external: true

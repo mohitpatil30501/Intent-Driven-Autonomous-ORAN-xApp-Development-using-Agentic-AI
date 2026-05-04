@@ -67,13 +67,14 @@ STEP 2: DISCOVER & PROFILE PROVIDED DATASETS (If any user paths are provided)
 - For ML datasets, use `semantic_search_summary` to FlexRIC-validate any remaining unmatched columns.
 
 STEP 3: GENERATE / MERGE DATAFRAMES
-- Write a python script `data/build_streaming_datasets.py` (using pandas, numpy, and json). This script MUST:
+- Write a python script `data/build_streaming_datasets.py` (using pandas, numpy, and json). You MUST use the `write_file` tool to create this script on disk. Do NOT try to run inline python scripts or heredocs (`python -c` or `python - << 'EOF'`) using the `terminal_command` tool. This script MUST:
   a. Load provided datasets (if any) and select ONLY the matched required columns and FLEXRIC_VALID columns. Rename them to their exact leaf node names.
   b. Synthesize any missing required leaf nodes using the **Data Synthesis Blueprint** above.
   c. **CRITICAL**: If you are synthesizing both the ML datasets and the streaming JSON, they MUST share the same underlying mathematical distribution and correlation logic. The streaming data should ideally be a continuation or a representative slice of the same signal used for training.
   d. For SYNTHETIC streaming data, generate a JSON file `data/streaming_mock_data.json` with 100-500 items. It MUST be a JSON array `[ {"timestamp": 1600000000, "data": { <Module 2 Telemetry_Variables schema> }}, ... ]`.
   e. If ML is required and the user wants SYNTHETIC ML data, generate 5000 rows for `data/historical_training_data.csv` and 1000 rows for `data/test_data.csv`.
-  f. Save the required files to `data/`.
+  f. OR If ML is required and the user provided an ML dataset, split the loaded/validated dataset into training (80%) and testing (20%).
+  g. Save the required files to `data/`.
 - **MANDATORY EXECUTION**: Run `python3 data/build_streaming_datasets.py` using your tools. If it fails, fix the code and re-run.
 
 STEP 4: CROSS-VALIDATE EVERY OUTPUT FILE

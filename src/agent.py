@@ -11,6 +11,7 @@ from module_3.data_engineer import module_3_data_node
 from module_4.ml_dev import module_4_ml_dev_node
 from module_5.core_programmer import module_5_logic_dev_node
 from module_6.integrator import module_6_integrator_node
+from module_7.deployer import module_7_deployer_node
 
 # Define the State for the LangGraph
 class AgentState(TypedDict):
@@ -96,6 +97,32 @@ def should_run_ml(state: AgentState):
         return "ml_dev"
     return "logic_dev"
 
+def ask_to_deploy(state: AgentState) -> dict:
+    return {
+        "messages": [AIMessage(
+            content=(
+                "Integration is complete and the final xApp is ready.\n"
+                "Do you want to proceed with deploying to the testbed?\n"
+                "Type 'Proceed' to deploy, or anything else to end."
+            )
+        )]
+    }
+
+def receive_deploy_decision(state: AgentState):
+    """
+    Interrupt node — graph pauses BEFORE this runs.
+    """
+    pass
+
+def should_deploy(state: AgentState):
+    if not state["messages"]:
+        return END
+    
+    last_msg = state["messages"][-1].content.strip().lower()
+    if "proceed" in last_msg:
+        return "deployer"
+    return END
+
 # Initialize the StateGraph
 builder = StateGraph(AgentState)
 
@@ -109,6 +136,9 @@ builder.add_node("data_engineer", module_3_data_node)
 builder.add_node("ml_dev", module_4_ml_dev_node)
 builder.add_node("logic_dev", module_5_logic_dev_node)
 builder.add_node("integrator", module_6_integrator_node)
+builder.add_node("ask_to_deploy", ask_to_deploy)
+builder.add_node("receive_deploy_decision", receive_deploy_decision)
+builder.add_node("deployer", module_7_deployer_node)
 
 # Set the entry point
 builder.add_edge(START, "intent_decomposer")
@@ -153,8 +183,20 @@ builder.add_conditional_edges(
 
 builder.add_edge("ml_dev", "logic_dev")
 builder.add_edge("logic_dev", "integrator")
-builder.add_edge("integrator", END)
+builder.add_edge("integrator", "ask_to_deploy")
+builder.add_edge("ask_to_deploy", "receive_deploy_decision")
+
+builder.add_conditional_edges(
+    "receive_deploy_decision",
+    should_deploy,
+    {
+        "deployer": "deployer",
+        END: END
+    }
+)
+
+builder.add_edge("deployer", END)
 
 # Compile the graph with interrupts before both human-input nodes
-graph = builder.compile(interrupt_before=["ask_human", "receive_dataset"])
-# graph = builder.compile(interrupt_before=["ask_human"])
+graph = builder.compile(interrupt_before=["ask_human", "receive_dataset", "receive_deploy_decision"])
+

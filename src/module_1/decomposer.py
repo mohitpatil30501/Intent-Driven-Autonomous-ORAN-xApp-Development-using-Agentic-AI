@@ -52,6 +52,7 @@ You MUST output your response in exactly TWO sections:
     "objective_Why": "string (Why do we need this? e.g., 'To prevent slice starvation' or 'TBD')",
     "target_Action_What_NL": "string (What action will it take? e.g., 'Modify PRB allocation' or 'TBD')",
     "cycle_Type": "Enum: [Supervised_ML, Unsupervised_ML, Pure_Logic, TBD]",
+    "Service Models": "List of Service Models (ORAN Specific e.g.: Slice Service Model, MAC SM, GTP, etc)",
     "requested_Telemetry_NL": [
       "List of metrics needed in plain English, e.g., 'per slice throughput' or 'TBD'"
     ],

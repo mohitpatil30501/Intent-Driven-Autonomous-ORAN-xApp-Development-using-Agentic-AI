@@ -60,6 +60,7 @@ build/
 src/workspace/*
 !src/workspace/README.md
 !src/workspace/flexric_template.py
+!src/workspace/testbed
 !src/workspace/.keep
 
 # Repositories & Data
