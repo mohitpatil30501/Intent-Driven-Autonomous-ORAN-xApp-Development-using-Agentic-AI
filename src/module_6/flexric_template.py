@@ -5,6 +5,59 @@ import xapp_sdk as ric
 # Dynamically import the core logic written by Module 5
 from logic.core_logic import XAppLogic
 
+def swig_to_dict(obj, max_depth=5, _depth=0):
+    """
+    Safely convert SWIG object (like FlexRIC 'ind') to Python dict
+    """
+    if _depth > max_depth:
+        return "..."
+
+    # Primitive types
+    if isinstance(obj, (int, float, str, bool)):
+        return obj
+
+    if isinstance(obj, bytes):
+        try:
+            return obj.decode()
+        except:
+            return str(obj)
+
+    # Python list/tuple
+    if isinstance(obj, (list, tuple)):
+        return [swig_to_dict(x, max_depth, _depth+1) for x in obj]
+
+    result = {}
+
+    for attr in dir(obj):
+        if attr.startswith("_") or attr in ("this", "thisown"):
+            continue
+
+        try:
+            val = getattr(obj, attr)
+
+            # Skip methods/functions
+            if callable(val):
+                continue
+
+            # Handle arrays (SWIG often exposes via __len__ + __getitem__)
+            if hasattr(val, "__len__") and hasattr(val, "__getitem__") and not isinstance(val, (str, bytes)):
+                try:
+                    result[attr] = [
+                        swig_to_dict(val[i], max_depth, _depth+1)
+                        for i in range(len(val))
+                    ]
+                    continue
+                except:
+                    pass
+
+            # Nested struct
+            result[attr] = swig_to_dict(val, max_depth, _depth+1)
+
+        except Exception as e:
+            result[attr] = f"<error: {e}>"
+
+    return result
+
 class UniversalCallback({{ SM_CALLBACK_BASE }}):
     def __init__(self, node_id, app_logic):
         {{ SM_CALLBACK_BASE }}.__init__(self)
@@ -14,7 +67,7 @@ class UniversalCallback({{ SM_CALLBACK_BASE }}):
     def handle(self, ind):
         # --- 1. EXTRACT TELEMETRY ---
         # Map the FlexRIC C-struct (ind) to a flat Python dictionary
-        row_dict = {}
+        row_dict = swig_to_dict(ind, 10)
         {{ TELEMETRY_MAPPING_CODE }}
         
         # --- 2. EXECUTE CORE LOGIC ---

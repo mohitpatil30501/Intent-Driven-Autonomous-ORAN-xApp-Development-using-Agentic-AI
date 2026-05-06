@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # Start the main application
-echo "Starting the core components"
+echo "Stopping the core components"
 cd core
 docker compose stop
 
-sleep 10
+sleep 5
 
 echo "Starting the nearrtric components"
 cd ..
 cd nearrtric
 docker compose stop
 
-sleep 10
+sleep 5
 
 echo "Starting the ran components"
 cd ..

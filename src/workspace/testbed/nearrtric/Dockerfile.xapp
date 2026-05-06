@@ -58,7 +58,8 @@ ARG KPM_VERSION=KPM_V3_00
 #flexric
 RUN git clone https://gitlab.eurecom.fr/mosaic5g/flexric /flexric
 WORKDIR /flexric
-RUN git checkout dev 
+RUN git fetch --all && \
+    git checkout $(git rev-list -n 1 --before="2025-12-15" dev)
 RUN mkdir build && \
     cd build && \
     cmake -GNinja -DCMAKE_BUILD_TYPE=Release \
@@ -68,7 +69,8 @@ RUN mkdir build && \
           -DCMAKE_C_COMPILER=gcc-12 \
           -DCMAKE_CXX_COMPILER=g++-12 .. && \
     ninja && \
-    ninja install
+    ninja install && \
+    ldconfig
 
 
 COPY ./xapps /flexric/build/examples/xApp/python3/
