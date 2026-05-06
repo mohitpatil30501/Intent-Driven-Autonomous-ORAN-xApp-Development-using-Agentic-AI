@@ -78,3 +78,6 @@ repo-data/
 # Vector Database Data
 chroma_data/
 chroma-data/
+
+# Example
+examples/

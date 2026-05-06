@@ -21,8 +21,10 @@ Your ONLY job is to inject the standalone logic created by Module 5 into a deplo
 CRITICAL RULES:
 1. You do NOT write algorithms. You ONLY write the mapping "glue" between FlexRIC's C-structs and the Python dictionary expected by `XAppLogic`.
 2. Look at the `Technical_Mapping` in the Blueprint to know which Service Model (SM) to use (e.g., MAC, KPM, RLC) and what the exact C-variables are.
-3. You must read `flexric_template.py` from the workspace and replace the placeholders.
-4. The search tools (`semantic_search_summary` and `semantic_search_detailed`) return code snippets directly in their response text. Do NOT use `read_file` or any file tool on paths mentioned in search results — those paths are internal to the search index and NOT accessible from the workspace.
+3. You must read `flexric_template.py` AND the logic script (usually `logic/core_logic.py`) from the workspace.
+4. You must create a SINGLE SCRIPT xApp. Instead of `from logic.core_logic import XAppLogic`, you must copy the ENTIRE `XAppLogic` class definition and any necessary imports from the logic script into `final_xapp.py`.
+5. If the logic script loads an ML model, ensure the model loading logic is preserved, but note that the model file itself must be present in the same directory as the script.
+6. The search tools (`semantic_search_summary` and `semantic_search_detailed`) return code snippets directly in their response text. Do NOT use `read_file` or any file tool on paths mentioned in search results — those paths are internal to the search index and NOT accessible from the workspace.
 
 --- PLACEHOLDER REPLACEMENT GUIDE ---
 1. `{{ SM_CALLBACK_BASE }}` -> E.g., `ric.mac_cb`, `ric.rlc_cb`, `ric.kpm_cb`
@@ -44,26 +46,30 @@ CRITICAL RULES:
 --- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
 Your work is incomplete and a FAILURE until you have:
 1. CREATED the `log/` directory using your tools.
-2. WRITTEN the `final_xapp.py` script with all placeholders replaced.
+2. WRITTEN the `final_xapp.py` script with all placeholders replaced and the `XAppLogic` class inlined.
 3. EXECUTED a syntax check using `python3 -m py_compile final_xapp.py`.
 4. READ the terminal output and SAVED it to `log/module_6_integrator.log`.
 5. FIXED any syntax errors or missing imports reported by the compiler.
 
---- WORKFLOW (4 STEPS, execute in order) ---
+--- WORKFLOW (5 STEPS, execute in order) ---
 
 STEP 1 — RAG LOOKUP:
   Call `semantic_search_summary(query="<SM> SM indication callback struct fields xApp example")`.
   Read the returned signatures directly from the response text.
-  Do NOT call read_file on any path mentioned in the search result.
-  If semantic_search_summary does not return enough information, you may use `semantic_search_detailed`.
 
-STEP 2 — READ TEMPLATE:
+STEP 2 — READ LOGIC:
+  Call `read_file` with the logic script path from the Blueprint (e.g., `logic/core_logic.py`).
+
+STEP 3 — READ TEMPLATE:
   Call `read_file` with filename `flexric_template.py`.
 
-STEP 3 — WRITE OUTPUT:
-  Call `write_file` with filename `final_xapp.py` containing the fully completed xApp with all 6 placeholders replaced.
+STEP 4 — WRITE OUTPUT:
+  Call `write_file` with filename `final_xapp.py` containing the fully completed xApp. This includes:
+    - All imports from the logic script.
+    - The inlined `XAppLogic` class replacing the `{{ INLINED_LOGIC_CODE }}` placeholder.
+    - All 6 other template placeholders replaced.
 
-STEP 4 — MANDATORY VERIFICATION:
+STEP 5 — MANDATORY VERIFICATION:
   Call `terminal_command` with:
     `mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log`
   If py_compile reports a syntax error, YOU MUST fix the code and re-run this step.
@@ -117,11 +123,12 @@ def module_6_integrator_node(state: dict) -> dict:
     prompt_content = (
         f"Integration Context (Technical Mapping + Logic Artifacts):\n"
         f"{json.dumps(integration_context, indent=2)}\n\n"
-        f"Execute the 4-step workflow: "
+        f"Execute the 5-step workflow: "
         f"(1) semantic_search_summary lookup, "
-        f"(2) read flexric_template.py, "
-        f"(3) write final_xapp.py with all 6 placeholders replaced, "
-        f"(4) run `mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log`. "
+        f"(2) read the logic script, "
+        f"(3) read flexric_template.py, "
+        f"(4) write final_xapp.py with the XAppLogic class inlined and all 6 placeholders replaced, "
+        f"(5) run `mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log`. "
         f"Then output the Final_Deployment JSON."
     )
 

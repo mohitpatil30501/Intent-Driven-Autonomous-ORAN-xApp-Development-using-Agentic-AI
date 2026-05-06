@@ -17,65 +17,43 @@ from tools.semantic_search.semantic_search_tool import (
 )
 from tools.context_utils import limit_context_window
 
-MODULE_2_SYSTEM_PROMPT = """You are "Module 2: The O-RAN Technical Mapper" in an automated xApp development pipeline.
-Your ONLY job is to map the "requested_Telemetry_NL" and "target_Action_What_NL" into EXACT FlexRIC Service Models and C-struct variables.
+from tools.deployer.testbed.introspection_tool import inspect_service_model_runtime
 
-CRITICAL RULES — NO HALLUCINATIONS:
-1. You MUST use `semantic_search_summary` to look up the FlexRIC codebase. Never guess variable names.
-2. TRACE NESTED TYPES: If a field is a struct or a pointer to a struct (e.g., `fr_slice_t* slices`), you MUST find the definition of that struct type to see its inner fields (like `id`).
-3. UNIONS & VARIANTS: When you encounter a `union`, you MUST expose the different attributes and possible variants as nested objects within the JSON structure so the complete object is visible.
-4. HIERARCHICAL JSON OUTPUT: The target output for Telemetry_Variables MUST be a hierarchical JSON object representing the complete streaming dataset payload structure, NOT a flat list of separate variables. Represent arrays in C as JSON arrays (`[]`) and structs as JSON objects (`{}`).
-5. ENTRY POINT IDENTIFICATION: You MUST identify the exact Indication Message struct (e.g., `kpm_ind_msg_t`, `slice_ind_msg_t`) that serves as the root of the telemetry stream. Search for "Indication Message" or "ind_msg" in the context of the requested Service Model.
-6. RECURSIVE TYPE EXPLORATION: For EVERY field in the root struct, if its type is not a primitive (int, float, etc.), you MUST search for its definition until you reach primitive types or well-known types. This is essential for providing "detailed knowledge" of the Service Model objects.
-7. NO TEMPLATES: Map to actual C struct/union field types found in the code. Do not use generic template placeholders.
+MODULE_2_SYSTEM_PROMPT = """You are "Module 2: The O-RAN Technical Mapper".
+Your ONLY job is to map requested telemetry to EXACT FlexRIC Service Model variables.
 
---- SEARCH STRATEGY ---
-1. CALL 1: Find the main Indication Message struct for the likely Service Model (e.g., SLICE, KPM, RC, MAC). Use queries like "typedef struct <SM>_ind_msg_s".
-2. CALL 2+: For every nested struct type or union encountered (e.g., `fr_slice_t`, `slice_params_u`), call `semantic_search_detailed` or `semantic_search_summary` to find its full definition.
-3. IDENTIFY DISCRIMINATORS & VARIANTS: If a union is used, find the enum discriminator (often in the same or parent struct) to understand how the variants are selected.
-4. VERIFY HIERARCHY: Ensure the final JSON reflects the exact nesting found in the C code, starting from the Indication Message root.
-5. DO NOT STOP until you have mapped every requested field with its full structural detail.
+--- MANDATORY VERIFICATION STRATEGY ---
+1. IDENTIFY SM: Determine if the request belongs to MAC, KPM, RLC, or SLICE.
+2. CALL inspect_service_model_runtime: Call this tool for the identified SM. 
+   - Start with `max_depth=3`.
+   - If the output contains `"..."` at a level where you expect your target variables to be, you MUST call it again with `max_depth=5` or `max_depth=7`.
+3. HANDLE ARRAYS: If the schema shows a list (e.g., `"slices": [...]`), your mapping MUST reflect that it is an array.
+4. MAP EXACTLY: Use the EXACT keys and nesting found in the tool's output.
+5. NO HALLUCINATIONS: Do not invent attributes. If the runtime tool doesn't show it, search the codebase with `semantic_search_detailed`.
 
 --- RESPONSE FORMAT ---
 Output a strict JSON code block:
-
 ```json
 {
   "Technical_Mapping": {
-    "Reporting_Service_Model": "MAC | KPM | RLC | RC | SLICE",
+    "Reporting_Service_Model": "...",
     "Telemetry_Variables": {
-      "// description": "A hierarchical JSON object reflecting the streaming dataset structure",
-      "slices": [
-        {
-          "id": "uint32_t",
-          "label": "char*",
-          "params": {
-            "type": "slice_algorithm_e /* enum */",
-            "...": "..."
-          }
-        }
-      ]
+       "//": "Use the EXACT hierarchical structure from the inspection tool",
+       "some_list": [
+         { "field1": "type", "field2": "type" }
+       ],
+       "nested_struct": {
+         "fieldA": "type"
+       }
     },
-    "Control_Service_Model": "MAC | RC | SLICE | ...",
-    "Action_Space_Menu": [
-      {
-        "action_id": "UPDATE_SLICE_PRB",
-        "description": "what it does",
-        "parameters": { "slice_id": "uint32_t", "prb_ratio": "uint8_t" }
-      },
-      {
-        "action_id": "DO_NOTHING",
-        "description": "Take no action",
-        "parameters": {}
-      }
-    ]
+    "Control_Service_Model": "...",
+    "Action_Space_Menu": [ ... ]
   }
 }
 ```
 """
 
 ORIOSEARCH_URL = os.getenv("ORIOSEARCH_URL", "http://localhost:8000")
-
 
 @tool
 def restricted_domain_search(query: str, domain: str = "o-ran-sc.org") -> str:
@@ -100,9 +78,10 @@ def restricted_domain_search(query: str, domain: str = "o-ran-sc.org") -> str:
         return f"Error: Status code {res.status_code}"
     except Exception as e:
         return f"Error connecting to oriosearch: {e}"
+    
 
 
-tools = [semantic_search_summary, semantic_search_detailed, restricted_domain_search]
+tools = [semantic_search_summary, semantic_search_detailed, restricted_domain_search, inspect_service_model_runtime]
 
 
 def get_llm():
@@ -146,8 +125,10 @@ def module_2_technical_node(state: dict) -> dict:
     prompt_content = (
         f"Here is the Intent Blueprint from Module 1:\n"
         f"{json.dumps(mapper_context, indent=2)}\n\n"
-        f"Use semantic_search_summary (2 calls max) to look up the FlexRIC codebase, "
-        f"then output the Technical_Mapping JSON.{sm_hint}"
+        f"MANDATORY FIRST STEP: Call `inspect_service_model_runtime` for the likely Service Model ({requested_sm or 'identify it first'}).\n"
+        f"If the output is too shallow (contains '...'), call it again with higher `max_depth` (e.g. 5 or 7).\n"
+        f"If the schema contains arrays (e.g. lists), you MUST reflect them as such in your mapping.\n"
+        f"Use the returned schema as the absolute source of truth for your Technical_Mapping JSON."
     )
 
     llm = get_llm()

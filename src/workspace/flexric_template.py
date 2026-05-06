@@ -2,8 +2,8 @@ import sys
 import time
 import xapp_sdk as ric
 
-# Dynamically import the core logic written by Module 5
-from logic.core_logic import XAppLogic
+# --- INLINED CORE LOGIC ---
+# {{ INLINED_LOGIC_CODE }}
 
 def swig_to_dict(obj, max_depth=5, _depth=0):
     """
@@ -100,14 +100,17 @@ def main():
 
     print("Subscription successful. Listening for indications...")
 
-    # Keep alive loop
-    while ric.try_stop == 0:
-        time.sleep(1)
-
-    # Cleanup
-    print("Shutting down...")
-    for h in handlers:
-        {{ SM_RM_REPORT_FUNCTION }}(h)
+    # Run the xApp for a duration (can be controlled via environment or signals)
+    try:
+        while ric.try_stop == 0:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("xApp stopped by user.")
+    finally:
+        print("Cleaning up subscriptions...")
+        for h in handlers:
+            ric.{{ SM_REMOVE_REPORT_FUNCTION }}(h)
+        print("xApp terminated.")
 
 if __name__ == '__main__':
     main()

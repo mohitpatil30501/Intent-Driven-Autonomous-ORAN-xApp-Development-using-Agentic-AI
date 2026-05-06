@@ -11,54 +11,25 @@ from langchain_ollama import ChatOllama
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from tools.workspace.workspace_tools import workspace_tools
 from tools.context_utils import limit_context_window
+from tools.deployer.testbed.introspection_tool import inspect_service_model_runtime
 
 MODULE_5_SYSTEM_PROMPT = """You are "Module 5: The Core Programmer" in an automated xApp development pipeline.
 Your ONLY job is to write the standalone algorithmic brain of the xApp.
 
 CRITICAL RULES - PURE LOGIC ONLY:
-1. DO NOT write any FlexRIC, E2, or networking code (no `ric.subscribe()`, no `ric.control()`). 
-2. Your code must be 100% independent, stateful, and object-oriented.
-3. Every decision your code makes MUST exactly match one of the schemas in `Technical_Mapping.Action_Space_Menu`.
+1. DO NOT write any FlexRIC, E2, or networking code.
+2. RUNTIME SCHEMA VERIFICATION (NEW): If the `Technical_Mapping` is unclear about attribute names (e.g., `ind.msg.mac_info` vs `ind.mac_info`), you MUST use the `inspect_service_model_runtime` tool. This will run a probe in the testbed to show you the EXACT Python object structure.
+3. Every decision your code makes MUST match the `Action_Space_Menu`.
 
---- VERIFICATION MANDATE (TRUST BUT VERIFY) ---
-Your work is incomplete and a FAILURE until you have:
-1. CREATED the `logic/` and `log/` directories using your tools.
-2. WRITTEN the `logic/core_logic.py` script.
-3. EXECUTED the script using `python3 logic/core_logic.py`.
-4. VERIFIED the script processes the `data/streaming_mock_data.json` file without errors and produces valid actions.
-5. READ the terminal output and SAVED it to `log/module_5_logic.log`. If it crashes, YOU MUST FIX IT and re-run.
+--- VERIFICATION MANDATE ---
+1. PREPARE: Create `logic/` and `log/` folders.
+2. INSPECT (IF NEEDED): Use `inspect_service_model_runtime` to verify the `ind` structure.
+3. WRITE: Create `logic/core_logic.py`.
+4. TEST: Run `python3 logic/core_logic.py` with mock data.
+5. SAVE: Save logs to `log/module_5_logic.log`.
 
 --- STRICT WORKFLOW INSTRUCTIONS ---
-You must use your tools to execute the following steps in order:
-
-1. PREPARE: Create `logic/` and `log/` folders inside the workspace.
-2. WRITE SCRIPT: Write `logic/core_logic.py`. This script MUST contain:
-   - A class named `XAppLogic`.
-   - An `__init__(self)` method. ONLY load a `.pkl` model file if `ML_Model_Artifacts` explicitly exists in the blueprint. If `cycle_Type` is `Pure_Logic` or `ML_Model_Artifacts` is absent, the `__init__` must be empty (no model loading, no sklearn imports). IGNORE any `model_acceptance_criteria` field — it is irrelevant for Pure_Logic.
-   - A method `process_interval(self, row_dict)` that takes a dictionary (representing one timestep of KPM data).
-   - `process_interval` MUST return a dictionary matching an action from the `Action_Space_Menu` (e.g., `{"action_id": "UPDATE_SLICE_PRB", "parameters": {"slice_id": 1, "prb_ratio": 80}}`).
-   
-3. WRITE TEST LOOP: At the bottom of `logic/core_logic.py`, write an `if __name__ == '__main__':` block that:
-   - Loads `Data_Paths.streaming_mock_data_path` using the `json` module.
-   - Instantiates `XAppLogic()`.
-   - Iterates through the JSON array, and passes the `data` payload to `process_interval()`.
-   - Prints the output decisions.
-
-4. MANDATORY EXECUTION: Run `python3 logic/core_logic.py` and redirect output to `log/module_5_logic.log`.
-   - **CRITICAL**: Read the log! The logic MUST NOT simply return `DO_NOTHING` for every single row. If it doesn't trigger the expected action for at least some rows (based on anomaly spikes in the data), your logic threshold or logic implementation is wrong. You MUST rewrite the logic to properly achieve the goal defined in the Blueprint and run it again.
-
---- RESPONSE FORMAT ---
-ONLY after the script has executed successfully and the logic works, output a final JSON block updating the blueprint.
-
-```json
-{
-  "Logic_Artifacts": {
-    "logic_script_path": "logic/core_logic.py",
-    "class_name": "XAppLogic",
-    "entry_function": "process_interval"
-  }
-}
-```
+... (rest of the workflow)
 """
 
 def get_llm():
@@ -81,19 +52,20 @@ def module_5_logic_dev_node(state: dict) -> dict:
     blueprint = copy.deepcopy(state.get("blueprint", {})) if isinstance(state.get("blueprint"), dict) else {}
     logic_context = _extract_logic_context(blueprint)
     prompt_content = (
-        f"Here is the complete Blueprint, including Technical Mapping, Data Paths, and ML Artifacts:\n"
+        f"Here is the complete Blueprint:\n"
         f"{json.dumps(logic_context, indent=2)}\n\n"
-        f"Create the `logic/` directory in the workspace, write `core_logic.py`, write the testing loop, "
-        f"and execute it by giving the streaming mock dataset from the data directory as input to ensure it processes the mock data without errors. Finally, return the Logic_Artifacts JSON.\n"
-        f"IMPORTANT: Create a `log/` directory in the workspace and save the terminal output of your script execution (the test loop) to `log/module_5_logic.log` using your tools."
+        f"Verify the `ind` structure using `inspect_service_model_runtime` if needed, "
+        f"then write and test `core_logic.py`."
     )
     
     llm = get_llm()
     
-    # Create the ReAct agent
+    # Include the new tool
+    module_5_tools = workspace_tools + [inspect_service_model_runtime]
+    
     logic_agent = create_react_agent(
         model=llm, 
-        tools=workspace_tools, 
+        tools=module_5_tools, 
         prompt=MODULE_5_SYSTEM_PROMPT,
         pre_model_hook=limit_context_window
     )
