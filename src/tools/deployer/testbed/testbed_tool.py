@@ -119,7 +119,21 @@ def deploy_xapp_to_testbed(xapp_code: str, artifacts: dict = None, timeout: int 
             if os.path.exists(host_path):
                 os.remove(host_path)
 
-        # 5. Restart only the xapp container
+        # 5. Check for requirements.txt and install dependencies if present
+        has_reqs = False
+        for _, container_name in artifact_staging_paths:
+            if container_name == "requirements.txt":
+                has_reqs = True
+                break
+        
+        if has_reqs:
+            print("Installing Python dependencies from requirements.txt...")
+            subprocess.run(
+                ["docker", "exec", "-u", "root", "xapp", "pip3", "install", "-r", f"{container_base}requirements.txt", "--break-system-packages"],
+                check=True
+            )
+
+        # 6. Restart only the xapp container
         subprocess.run(["docker", "restart", "xapp"], check=True)
 
         # 6. Wait for requested timeout for the xApp to run

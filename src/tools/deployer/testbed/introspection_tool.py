@@ -116,9 +116,8 @@ class SchemaAwareCallback(ric.{cfg['callback_class']}):
 
     def handle(self, ind):
         if not self.inspected:
-            print("\\n[AGENT_INSPECTION_START]")
-            data_dict = swig_to_dict(ind, max_depth=self.max_depth)
-            print(json.dumps(data_dict, indent=2))
+            print("[AGENT_INSPECTION_START]")
+            print(swig_to_dict(ind, max_depth=self.max_depth))
             print("[AGENT_INSPECTION_END]")
             self.inspected = True
             ric.try_stop = 1
@@ -134,14 +133,7 @@ def main():
     cb = SchemaAwareCallback(max_depth={max_depth})
     hndlr = ric.{cfg['report_fn']}(conn[0].id, ric.{cfg['interval']}, cb)
 
-    start_time = time.time()
-    while ric.try_stop == 0 and (time.time() - start_time) < 60:
-        time.sleep(1)
-
-    if ric.try_stop == 0:
-        print("[AGENT_INSPECTION_START]")
-        print("{{ \\"error\\": \\"Timeout: No indication data received from RAN after 60s.\\" }}")
-        print("[AGENT_INSPECTION_END]")
+    time.sleep(10)
 
     # Cleanup subscription
     print("Cleaning up subscription...")
@@ -152,10 +144,17 @@ if __name__ == '__main__':
 """
     
     try:
-        # Increase the wait time for the deployment tool to allow probe to finish
-        # We call the function logic with a custom timeout of 65s to match the probe's 60s loop
-        logs = deploy_xapp_to_testbed.func(probe_code, timeout=65)
+        # We call the function logic with a custom timeout of 55s to allow for a small buffer
+        # before the 60s hard timeout of the tool itself.
+        import concurrent.futures
         
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(deploy_xapp_to_testbed.func, probe_code, timeout=120)
+            try:
+                logs = future.result(timeout=120)
+            except concurrent.futures.TimeoutError:
+                return "Error: Introspection tool timed out after 60 seconds. The testbed might be slow or unresponsive. Please try again or use semantic search for static mapping."
+
         if "[AGENT_INSPECTION_START]" in logs:
             parts = logs.split("[AGENT_INSPECTION_START]")
             return parts[1].split("[AGENT_INSPECTION_END]")[0].strip()

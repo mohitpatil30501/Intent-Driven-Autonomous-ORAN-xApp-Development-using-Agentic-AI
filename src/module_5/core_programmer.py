@@ -25,8 +25,9 @@ CRITICAL RULES - PURE LOGIC ONLY:
 1. PREPARE: Create `logic/` and `log/` folders.
 2. INSPECT (IF NEEDED): Use `inspect_service_model_runtime` to verify the `ind` structure.
 3. WRITE: Create `logic/core_logic.py`.
-4. TEST: Run `python3 logic/core_logic.py` with mock data.
-5. SAVE: Save logs to `log/module_5_logic.log`.
+4. DEPENDENCIES: If you use any external libraries (numpy, pandas, sklearn, etc.), create a `requirements.txt` file in the workspace root listing them.
+5. TEST: Run `python3 logic/core_logic.py` with mock data.
+6. SAVE: Save logs to `log/module_5_logic.log`.
 
 --- STRICT WORKFLOW INSTRUCTIONS ---
 ... (rest of the workflow)
