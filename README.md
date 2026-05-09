@@ -1,6 +1,6 @@
 # Intent-Driven Autonomous O-RAN xApp Development using Agentic AI
 
-This repository implements a LangGraph-based agent pipeline that converts a high-level natural-language network intent into a deployable FlexRIC-style xApp scaffold. The system is organized as six sequential modules, each acting as a specialized agent role: intent analyst, O-RAN mapper, data engineer, ML developer, core logic programmer, and FlexRIC integrator.
+This repository implements a LangGraph-based agent pipeline that converts a high-level natural-language network intent into a deployable FlexRIC-style xApp, and optionally deploys it on a local testbed. The system is organized as seven sequential modules, each acting as a specialized agent role: intent analyst, O-RAN mapper, data engineer, ML developer, core logic programmer, FlexRIC integrator, and testbed deployer.
 
 At runtime, the modules collaborate through a shared `blueprint` dictionary. Each stage reads the current blueprint, enriches it with new technical details or generated artifacts, and returns the updated state to the graph.
 
@@ -17,61 +17,71 @@ Human review / confirmation  [INTERRUPT]
    |
    v
 Module 2: Technical Mapper
-   |  Queries Semantic Search (port 7080) — 2 calls max
-   |  Adds FlexRIC service-model and variable mappings
+   |  Queries Semantic Search (port 7080) for FlexRIC C-structs
+   |  Produces hierarchical Telemetry_Variables JSON + Action_Space_Menu
    v
 Dataset question  [INTERRUPT]
    |  "Do you have an existing dataset, or should one be synthesized?"
+   |  Free-form natural language reply (path, 'no', or a mix)
    v
-Conditional branch
-   |-- User provides a path --> Module 3b: Dataset Profiler
-   |                            Discovers, filters (FlexRIC-only columns),
-   |                            maps, and ingests the user's dataset
-   |-- "no"               --> Module 3: Data Synthesizer
-   |                            Generates 5 000-row training data and
-   |                            streaming mock data using numpy vectorized calls
+Module 3: Data Engineer (unified)
+   |  Discovers user paths if any, RAN-validates additional columns,
+   |  synthesizes missing data with correlated numpy signals,
+   |  writes streaming_mock_data.json + ML CSVs
    v
 Conditional branch
    |-- Supervised_ML / Unsupervised_ML --> Module 4: ML Developer
-   |                                      Trains model, writes evaluation_report.json
-   |                                      after every attempt, recovers artifacts
-   |                                      from workspace if agent is interrupted
+   |                                      Runs the pre-written two-stage
+   |                                      auto-training script and writes
+   |                                      ml/evaluation_report.json
    v
 Module 5: Core Programmer
-   |  Creates and tests standalone XAppLogic
+   |  Creates and tests standalone XAppLogic against streaming JSON
    v
 Module 6: xApp Integrator
-   |  Queries Semantic Search (1 call) for struct field names
-   |  Injects logic into FlexRIC template
+   |  Queries Semantic Search for SM callback patterns
+   |  Injects logic into the FlexRIC Python template
    v
-Final xApp artifact
+Deployment question  [INTERRUPT]
+   |  "Proceed with deploying to the testbed?"
+   v
+Conditional branch
+   |-- "Proceed"  --> Module 7: Deployer
+   |                  Copies artifacts to nearrtric/xapps,
+   |                  rebuilds the Docker image, runs the xApp for 20s,
+   |                  captures container logs
+   |-- otherwise  --> END
 ```
 
-The main graph is defined in `src/agent.py`. It uses LangGraph's `StateGraph` and a small set of conditional routing functions to decide when to pause for the human, when to proceed to technical mapping, and whether ML training is required.
+The main graph is defined in `src/agent.py`. It uses LangGraph's `StateGraph` and a small set of conditional routing functions to decide when to pause for the human, when to proceed to technical mapping, whether ML training is required, and whether to deploy.
 
 ## Repository Layout
 
 ```text
 .
 |-- requirements.txt
+|-- QUICKSTART.md
+|-- README.md
 |-- src
 |   |-- agent.py
 |   |-- langgraph.json
-|   |-- module_1
-|   |-- module_2
-|   |-- module_3
-|   |-- module_4
-|   |-- module_5
-|   |-- module_6
+|   |-- module_1                # Intent Decomposer
+|   |-- module_2                # Technical Mapper
+|   |-- module_3                # Data Engineer (unified synth + profile)
+|   |-- module_4                # ML Developer (auto_train + registry)
+|   |-- module_5                # Core Programmer
+|   |-- module_6                # xApp Integrator (FlexRIC template)
+|   |-- module_7                # Testbed Deployer
 |   |-- tools
-|   |   |-- semantic_search     # Semantic Search Docker + Tool API wrappers
+|   |   |-- semantic_search     # Dockerized FlexRIC code search (Chroma + HF)
+|   |   |-- oriosearch          # O-RAN web search (Docker)
 |   |   |-- workspace           # File + terminal tools for ReAct agents
-|   |   `-- oriosearch          # O-RAN web search (Docker)
+|   |   `-- context_utils.py    # Sliding-window message trimmer
 |   `-- workspace               # All generated artifacts land here
 `-- test
 ```
 
-The `src/workspace` directory is the controlled working area used by tool-enabled agents. Generated data, scripts, logs, logic code, ML artifacts, and final xApp files are created there.
+The `src/workspace` directory is the controlled working area used by tool-enabled agents. Generated data, scripts, logs, logic code, ML artifacts, and the final xApp file are created there.
 
 ## Runtime State
 
@@ -82,7 +92,7 @@ class AgentState(TypedDict):
     messages: Annotated[list, add_messages]
     blueprint: Dict[str, Any]
     is_complete: bool
-    user_dataset_path: Optional[str]
+    user_dataset_input: str   # Free-form NL describing data availability
 ```
 
 | Field | Purpose |
@@ -90,41 +100,43 @@ class AgentState(TypedDict):
 | `messages` | Human/assistant conversation accumulated by LangGraph |
 | `blueprint` | Structured contract passed between modules |
 | `is_complete` | Whether the intent blueprint has enough information to proceed |
-| `user_dataset_path` | Set by `receive_dataset` after the dataset interrupt. `None` = auto-synthesize; non-empty string = absolute path to the user's dataset |
+| `user_dataset_input` | Set by `receive_dataset` after the dataset interrupt. Can be `'no'`, an absolute path, or a free-form mix such as "Use /path/to/ml_data for training/testing, but synthesize streaming data" |
 
-The pipeline relies on JSON extraction from LLM responses. Most modules ask the LLM/ReAct agent to emit a strict JSON block, parse that block, then merge the parsed values back into `blueprint`.
+The pipeline relies on JSON extraction from LLM responses. Most modules ask the LLM/ReAct agent to emit a strict JSON block, parse it, then merge the parsed values back into `blueprint`.
 
 ## Orchestration: `src/agent.py`
 
-`src/agent.py` is the conductor. It imports all six module node functions and wires them into a LangGraph workflow.
+`src/agent.py` is the conductor. It imports all seven module node functions and wires them into a LangGraph workflow.
 
 Key nodes:
 
 - `intent_decomposer`: runs Module 1 and produces the initial intent blueprint.
 - `ask_human`: a placeholder node used as an interrupt point for human-in-the-loop review.
 - `technical_mapper`: runs Module 2 after the human confirms the blueprint.
-- `ask_dataset`: appends an AIMessage listing the required FlexRIC telemetry columns and asking whether the user has an existing dataset.
-- `receive_dataset`: reads the user's reply and writes it to `user_dataset_path` in state (`None` if "no").
-- `data_synthesizer`: runs Module 3 and generates synthetic CSV data files.
-- `dataset_profiler`: runs Module 3b when the user supplies a dataset path; discovers files, filters to FlexRIC-reportable columns only, maps them to the required telemetry variables, and outputs the same `Data_Paths` structure as `data_synthesizer`.
+- `ask_dataset`: appends an AIMessage that shows the FlexRIC-validated telemetry schema and asks the user how to source the data (path / `no` / mix).
+- `receive_dataset`: reads the user's reply and stores it verbatim in `user_dataset_input`.
+- `data_engineer`: runs Module 3 — handles synthesis, profiling of user-provided datasets, and any mix of the two.
 - `ml_dev`: conditionally runs Module 4 for ML-based xApps.
 - `logic_dev`: runs Module 5 and writes the standalone decision engine.
 - `integrator`: runs Module 6 and creates the final FlexRIC-integrated xApp.
+- `ask_to_deploy`: appends an AIMessage asking whether to deploy to the testbed.
+- `receive_deploy_decision`: interrupt node that pauses for the user's deploy decision.
+- `deployer`: runs Module 7 only when the user types `Proceed`.
 
 Important routing functions:
 
 - `should_continue(state)`: always routes from Module 1 to `ask_human`, forcing review before continuing.
 - `check_confirmation(state)`: sends the flow to Module 2 only when the blueprint is complete and the latest human message contains `confirm`.
-- `check_dataset_input(state)`: routes to `dataset_profiler` when `user_dataset_path` is set, otherwise to `data_synthesizer`.
-- `should_run_ml(state)`: checks `Intent_Blueprint.cycle_Type`; routes to Module 4 for `Supervised_ML` or `Unsupervised_ML`, otherwise skips directly to Module 5. Both `data_synthesizer` and `dataset_profiler` feed into this gate.
+- `should_run_ml(state)`: checks `Intent_Blueprint.cycle_Type`; routes to Module 4 for `Supervised_ML` or `Unsupervised_ML`, otherwise skips directly to Module 5. Module 3 is responsible for nulling-out ML acceptance criteria when the cycle is `Pure_Logic` so this gate sees a clean state.
+- `should_deploy(state)`: routes to `deployer` only when the human reply contains `proceed`; otherwise terminates the graph.
 
 The graph is compiled with:
 
 ```python
-graph = builder.compile(interrupt_before=["ask_human", "receive_dataset"])
+graph = builder.compile(interrupt_before=["ask_human", "receive_dataset", "receive_deploy_decision"])
 ```
 
-There are two human-in-the-loop interrupt points: the first pauses for blueprint confirmation, the second pauses for the dataset question after Module 2 completes.
+There are three human-in-the-loop interrupt points: blueprint confirmation, the dataset question after Module 2, and the deploy decision after Module 6.
 
 ## Module 1: Intent Decomposer
 
@@ -140,6 +152,7 @@ It must capture:
 - action to take,
 - objective or reason,
 - cycle type: `Pure_Logic`, `Supervised_ML`, or `Unsupervised_ML`,
+- Service Model hint (e.g. SLICE, MAC, KPM, RC),
 - data behavior, especially for ML scenarios,
 - model acceptance criteria for ML scenarios, defaulting to threshold `0.85` with metric policy `task_aware` when the user does not specify one. For `Pure_Logic` workflows all three criteria fields (`threshold`, `metric_policy`, `metric_description_NL`) are set to `null` so downstream modules are not confused into loading a non-existent model.
 
@@ -147,7 +160,7 @@ Main functions:
 
 - `get_llm()`: creates a `ChatOllama` client using `OLLAMA_URL` and `OLLAMA_MODEL`.
 - `extract_json(text)`: extracts the JSON code block from the model response.
-- `decomposer_node(state, config)`: invokes the LLM, parses the blueprint, and sets `is_complete`.
+- `decomposer_node(state, config)`: invokes the LLM, parses the blueprint, and sets `is_complete`. Uses `limit_context_window` to keep the conversation under 14 messages.
 
 Expected output shape:
 
@@ -164,6 +177,7 @@ Expected output shape:
     "objective_Why": "string",
     "target_Action_What_NL": "string",
     "cycle_Type": "Pure_Logic | Supervised_ML | Unsupervised_ML | TBD",
+    "Service Models": ["e.g. SLICE SM", "MAC SM"],
     "requested_Telemetry_NL": [],
     "data_Requirements": {
       "needs_historical_training_data": false,
@@ -187,37 +201,48 @@ Location: `src/module_2/mapper.py`
 
 Role: O-RAN engineer.
 
-Module 2 translates the plain-English blueprint into concrete FlexRIC technical mappings using **Semantic Search**.
+Module 2 translates the plain-English blueprint into concrete FlexRIC technical mappings using the **Semantic Search** service (Dockerized Chroma + HuggingFace embeddings, port 7080). It searches for the Indication Message struct that anchors the requested Service Model, then recursively explores every nested struct, union, and enum until all types are primitives.
 
-**Search strategy — 2 calls maximum:**
+**Key responsibilities — no hallucinations:**
 
-1. `semantic_search_summary(query="<SM> SM indication struct telemetry variables")` — finds the exact C variable names for the requested metrics.
-2. `semantic_search_summary(query="<SM> SM control message struct action")` — finds the control struct fields and action types.
+1. Identify the exact Indication Message struct (`kpm_ind_msg_t`, `slice_ind_msg_t`, etc.) for the requested Service Model.
+2. Trace nested types: when a field is a `struct*` or `union`, look up its definition.
+3. Expose union variants and enum discriminators so the streaming payload structure is fully visible.
+4. Produce a hierarchical JSON object reflecting the actual C nesting — not a flat list.
+5. Map each action in `Action_Space_Menu` to actual C struct/union field types.
 
 Available tools:
 
-- `semantic_search_summary`: Primary search tool that returns broad context and code snippets.
-- `semantic_search_detailed`: Only used when full function bodies are needed.
-- `restricted_domain_search`: web search via OrioSearch (port 8000), restricted to domains such as `o-ran-sc.org`. Used only as a fallback.
+- `semantic_search_summary(query, n_results=5)` — primary tool; calls `POST /semantic_search` on the Semantic Search server.
+- `semantic_search_detailed(query, n_results=2)` — same endpoint but returns full code bodies; reserved for digging into a specific struct definition once located.
+- `restricted_domain_search(query, domain="o-ran-sc.org")` — web search via OrioSearch; used as a fallback when codebase search is insufficient.
 
 Main function:
 
-- `module_2_technical_node(state)`: builds a Structural-RAG-grounded ReAct agent (2-call strategy), passes it the current blueprint, and parses a `Technical_Mapping` JSON block.
+- `module_2_technical_node(state)`: builds a Semantic-Search-grounded ReAct agent, passes it the Intent Blueprint only (other blueprint fields are stripped to keep the prompt small), and parses a `Technical_Mapping` JSON block.
 
-Expected blueprint addition:
+Expected blueprint addition (hierarchical, not flat):
 
 ```json
 {
   "Technical_Mapping": {
-    "Reporting_Service_Model": "MAC | KPM | RLC | RC",
-    "Telemetry_Variables": [
-      {
-        "NL_name": "per slice throughput",
-        "C_variable": "dl_aggr_tbs",
-        "data_type": "uint32_t"
-      }
-    ],
-    "Control_Service_Model": "MAC | RC",
+    "Reporting_Service_Model": "SLICE",
+    "Telemetry_Variables": {
+      "slices": [
+        {
+          "id": "uint32_t",
+          "label": "char*",
+          "params": {
+            "type": "slice_algorithm_e /* enum */",
+            "u": {
+              "STATIC": { "pos_low": "uint32_t", "pos_high": "uint32_t" },
+              "NVS":    { "conf": "nvs_slice_conf_e", "u": { "RATE": { "u_rate": {"mb_rsvd": "float", "mb_max": "float"} } } }
+            }
+          }
+        }
+      ]
+    },
+    "Control_Service_Model": "SLICE",
     "Action_Space_Menu": [
       {
         "action_id": "UPDATE_SLICE_PRB",
@@ -237,137 +262,119 @@ Expected blueprint addition:
 }
 ```
 
-This module is the safety barrier against invented FlexRIC symbols. The prompt requires search before mapping and tells the agent to mark unsupported capabilities rather than fabricate variables.
+This module is the safety barrier against invented FlexRIC symbols. The prompt requires search before mapping and tells the agent to trace every non-primitive type recursively rather than emit template placeholders.
 
-## Module 3: Data Preparation (Synthesizer or Profiler)
+## Module 3: Data Engineer (unified)
 
-After Module 2 completes, the graph pauses and asks:
+Location: `src/module_3/data_engineer.py`
 
-> "Do you have an existing dataset? Type 'no' to auto-generate synthetic data, or provide an absolute path."
+Role: data engineer.
 
-The answer routes the graph to one of two data-preparation nodes. Both produce the identical `Data_Paths` blueprint addition so all downstream modules are unaffected by which path was taken.
+After Module 2 completes, the graph pauses and shows the FlexRIC-validated telemetry schema, then asks:
 
-### Module 3a: Data Synthesizer
+> "Please specify your data availability. Examples:
+> • 'Generate all synthetic data' (or 'no')
+> • 'Use /path/to/data/ for all data'
+> • 'Use /path/to/ml_data/ for training/testing, but synthesize streaming data'"
 
-Location: `src/module_3/synthesizer.py`
+A single unified node — `module_3_data_node` — handles **all three modes** (full synthesis, full profile, or any mix). The user's free-form reply is stored in `state["user_dataset_input"]` and passed straight to the agent.
 
-Role: data engineer (synthetic path).
+**Critical rules enforced by the prompt:**
 
-Activated when the user types `no` at the dataset prompt.
+- *RAN-reportable columns only.* Required columns come from the leaf nodes of `Technical_Mapping.Telemetry_Variables` (already FlexRIC-validated by Module 2). Additional columns from a user dataset must be verified with `semantic_search_summary` against the FlexRIC codebase before inclusion. Admin/infrastructure columns (IPs, MACs, timestamps, user IDs, URLs) are always excluded.
+- *No random noise for primary signals.* Synthesis must use temporally continuous random walks or sine + noise, derive features from a master variable (e.g. `throughput = num_ues * base_kbps * (1 - congestion_factor)`), inject goal-driven anomaly patterns when the intent calls for them, and use vectorized numpy.
+- *Structural integrity.* The streaming JSON must exactly map the correlated values into the hierarchical `Technical_Mapping.Telemetry_Variables` schema produced by Module 2.
+
+**5-step workflow:**
+
+1. Analyze the user's data availability string and `cycle_Type`. Create `data/` and `log/` directories.
+2. Discover and pre-filter user-provided datasets (if any paths were given) using a generated `data/pre_filter.py` script.
+3. Generate / merge dataframes — write `data/build_streaming_datasets.py` to disk (no inline `python -c` heredocs allowed), then execute it. Synthetic streaming and ML data must share the same underlying signal.
+4. Cross-validate every output file with `ls`, `head`, and shape/length checks.
+5. Determine `training_data_profile`.
 
 Main function:
 
-- `module_3_data_node(state)`: creates a ReAct agent, instructs it to write and execute a data-generation script using numpy vectorized calls, verify the first rows, and return data paths.
+- `module_3_data_node(state)`: creates a ReAct agent over `workspace_tools + [semantic_search_summary]`, passes it `{Intent_Blueprint, Technical_Mapping}` plus the user data string, parses the `Data_Paths` JSON block, and runs `_finalize_data_paths` to fill in defaults and null-out ML criteria for `Pure_Logic`.
 
-Row-count targets:
+Row-count targets (synthesis):
 
 | File | Target |
 |---|---|
-| `streaming_mock_data.csv` | 100–500 rows |
-| `historical_training_data.csv` | **Exactly 5 000 rows** (numpy vectorized, no Python loops) |
-| `test_data.csv` | **Exactly 1 000 rows** |
+| `streaming_mock_data.json` | 100–500 items |
+| `historical_training_data.csv` | 5 000 rows |
+| `test_data.csv` | 1 000 rows |
+
+When the user provides ML data, it is split 80% / 20% into training and test instead of synthesized.
 
 Generated artifacts:
 
-- `src/workspace/data/generate_data.py`
-- `src/workspace/data/streaming_mock_data.csv`
-- `src/workspace/data/historical_training_data.csv` for ML workflows
-- `src/workspace/data/test_data.csv` for ML evaluation workflows
-- `src/workspace/log/module_3_data.log`
+- `src/workspace/data/build_streaming_datasets.py`
+- `src/workspace/data/pre_filter.py` (only when user paths are profiled)
+- `src/workspace/data/streaming_mock_data.json` (hierarchical, matches Telemetry_Variables)
+- `src/workspace/data/historical_training_data.csv` (ML workflows)
+- `src/workspace/data/test_data.csv` (ML workflows)
+- `src/workspace/log/module_3_data_engineer.log`
 
-Behavior by cycle type:
-
-- `Pure_Logic`: only streaming mock data is generated.
-- `Supervised_ML`: all three files. Training and test data both include a `label` column balanced ~50/50.
-- `Unsupervised_ML`: all three files. Historical training data may be unlabeled or normal-heavy; test data includes labels when possible so Module 4 can compute anomaly F1.
-- Autoencoder-style anomaly workflows: normal-only historical training data plus mixed normal/anomaly test data with labels.
-
-### Module 3b: Dataset Profiler
-
-Location: `src/module_3/profiler.py`
-
-Role: data engineer (user-provided dataset path).
-
-Activated when the user provides a file or directory path at the dataset prompt.
-
-**Design principle — RAN-reportable columns only:** An xApp deployed on a real RAN (srsRAN via FlexRIC service models) can only receive metrics that FlexRIC can actually report. The profiler enforces this by:
-
-1. Accepting only columns from `Technical_Mapping.Telemetry_Variables[*].C_variable` as required (these are already FlexRIC-validated by Module 2).
-2. Validating any additional columns for ML enrichment against the FlexRIC codebase using `semantic_search_summary`. Columns with no FlexRIC match are excluded.
-
-**Handling large and multi-file datasets:** The profiler uses a two-phase approach:
-
-- **Phase 1 — Python pre-filter (no LLM):** A generated script loads only column headers (zero-row read), detects dtypes from a 500-row sample, and drops non-numeric, admin/infrastructure, and zero-variance columns. This reduces a 280-column dataset to a manageable candidate list before any LLM reasoning begins.
-- **Phase 2 — LLM reasoning on the reduced set:** The agent matches the candidate columns to required telemetry variables (exact → case-insensitive → normalized → semantic) and validates additional columns with `semantic_search_summary`.
-
-Main function:
-
-- `dataset_profiler_node(state)`: runs a 9-step ReAct agent workflow: discover files → load headers → pre-filter → match required columns → FlexRIC-validate additional columns → determine split strategy → build merged dataframe → cross-validate → set `training_data_profile`.
-
-Generated artifacts:
-
-- `src/workspace/data/pre_filter.py`
-- `src/workspace/data/profile_and_merge.py`
-- `src/workspace/data/streaming_mock_data.csv`
-- `src/workspace/data/historical_training_data.csv` for ML workflows
-- `src/workspace/data/test_data.csv` for ML evaluation workflows
-- `src/workspace/log/module_3_profiler.log`
-
-### Shared Blueprint Addition
-
-Both paths produce the same `Data_Paths` structure:
+Shared blueprint addition:
 
 ```json
 {
   "Data_Paths": {
-    "streaming_mock_data_path": "data/streaming_mock_data.csv",
+    "streaming_mock_data_path": "data/streaming_mock_data.json",
     "historical_training_data_path": "data/historical_training_data.csv",
     "test_data_path": "data/test_data.csv",
     "test_label_column": "label",
-    "training_data_profile": "supervised_labeled | supervised_synthesized_labels | unsupervised_mixed | unsupervised_unlabeled_test | autoencoder_normal_train_anomaly_test | pure_logic",
-    "profiler_notes": "string (profiler path only)"
+    "training_data_profile": "supervised_labeled | supervised_synthesized_labels | unsupervised_mixed | unsupervised_unlabeled_test | pure_logic",
+    "profiler_notes": "string describing data sources used, synthesized columns, row counts"
   }
 }
 ```
 
-For `Pure_Logic`, the ML-only paths and label column are `null` and `training_data_profile` is `pure_logic`.
-
-The two additional `training_data_profile` values produced by the profiler:
-
-- `supervised_synthesized_labels`: Supervised ML where the source dataset lacked a label column and labels were synthesized.
-- `unsupervised_unlabeled_test`: Unsupervised ML where the source dataset contained no label column for the test split.
+For `Pure_Logic`, the ML-only paths and label column are `null`, `training_data_profile` is `pure_logic`, and the agent additionally clears `Intent_Blueprint.model_acceptance_criteria` so Modules 5/6 do not misinterpret a leftover threshold value as an instruction to load a model.
 
 ## Module 4: ML Developer
 
-Location: `src/module_4/ml_dev.py`
+Location: `src/module_4/ml_dev.py` (orchestrator) and `src/module_4/auto_train.py`, `src/module_4/registry.py` (training engine).
 
 Role: data scientist.
 
-Module 4 runs only when `cycle_Type` is `Supervised_ML` or `Unsupervised_ML`. It trains candidate models from historical data, evaluates them on the separate test dataset, and saves only the best model artifact.
+Module 4 runs only when `cycle_Type` is `Supervised_ML` or `Unsupervised_ML`. The training script is **pre-written deterministically** by the orchestrator, not by the LLM — the agent's only job is to execute it and verify the report.
 
-**Reliability design:** `ml/train.py` is instructed to overwrite `ml/evaluation_report.json` after every training attempt, not just at the end. If the agent exhausts its recursion limit, the node reads the report directly from the workspace filesystem. If no report exists at all (agent crashed before writing), a fallback report is written with `threshold_met: false` and an explanation so the operator always gets a result.
+**Two-stage auto-training pipeline:**
 
-Main function:
+1. **Spot-check stage** — `module_4/registry.py` defines a curated list of sklearn algorithms (classifiers, regressors, anomaly detectors). Each runs once with default parameters on the training data.
+2. **Tuning stage** — `RandomizedSearchCV` tunes the top performers from stage 1 and re-evaluates them on the held-out test set.
 
-- `module_4_ml_dev_node(state)`: backfills ML acceptance defaults, explores train/test CSVs in a single combined one-liner, writes `ml/train.py` (which writes the evaluation report after each attempt), runs it, and parses `ML_Model_Artifacts`.
-- `_write_fallback_report(blueprint, error_msg)`: writes a minimal `ml/evaluation_report.json` if the agent crashes or hits the recursion limit before creating one.
-- `_recover_artifacts_from_workspace(blueprint)`: reads `ml/evaluation_report.json` from disk after the agent finishes, regardless of whether the agent emitted valid JSON in its final message.
+`module_4/auto_train.py` exposes `run_auto_training(...)` which:
+
+- Reads `Data_Paths.historical_training_data_path` and `test_data_path`.
+- Selects the metric based on `metric_policy` and the dataset profile (accuracy, F1, anomaly F1, neg_rmse, autoencoder reconstruction separation).
+- Writes `ml/evaluation_report.json` and `ml/saved_model.pkl`.
+
+The orchestrator (`ml_dev.py`) writes a thin wrapper at `ml/train.py` that calls `run_auto_training` with the threshold, cycle type, and label hint already substituted in. The ReAct agent then:
+
+1. Ensures `ml/` exists.
+2. Runs `python3 ml/train.py`.
+3. Verifies `ml/evaluation_report.json` parses.
+4. Saves terminal output to `log/module_4_ml.log`.
+5. Emits the final JSON block.
+
+**Reliability design:** if the agent crashes or hits its recursion limit, `_recover_artifacts_from_workspace` reads `ml/evaluation_report.json` directly from disk. If no report exists at all, `_write_fallback_report` writes a minimal report with `status: AGENT_FAILED` and `threshold_met: false` so the operator always gets a result.
+
+Main functions:
+
+- `module_4_ml_dev_node(state)`: pre-writes `ml/train.py`, invokes the ReAct agent with `workspace_tools`, parses `ML_Model_Artifacts`, and falls back to workspace recovery if the agent's output is unusable.
+- `_write_train_script(...)`: emits `ml/train.py` from a string template, baking in the train/test paths, threshold, cycle type, metric policy, and label hint.
+- `ensure_model_acceptance_defaults(blueprint)`: backfills threshold `0.85` and `metric_policy="task_aware"` if older blueprints are missing them.
+- `_write_fallback_report(blueprint, error_msg)` and `_recover_artifacts_from_workspace(blueprint)`.
 
 Generated artifacts:
 
-- `src/workspace/ml/train.py`
+- `src/workspace/ml/train.py` (deterministic wrapper)
 - `src/workspace/ml/saved_model.pkl`
 - `src/workspace/ml/evaluation_report.json`
 - `src/workspace/log/module_4_ml.log`
-
-Evaluation behavior:
-
-- Reads `Intent_Blueprint.model_acceptance_criteria.threshold`, defaulting to `0.85`.
-- Reads `Intent_Blueprint.model_acceptance_criteria.metric_policy`, defaulting to `task_aware`.
-- Reads `MAX_TRAINING_ATTEMPTS` from the environment, defaulting to `5`. The generated `train.py` also reads this env var.
-- For supervised labels, uses accuracy by default and F1 when class imbalance makes it more appropriate.
-- For unsupervised anomaly detection with labeled test data, uses anomaly F1 as the primary metric.
-- For autoencoder-style workflows, trains on normal data, scores reconstruction error on mixed test data, and evaluates anomaly F1 when labels exist.
 
 Expected blueprint addition:
 
@@ -377,7 +384,7 @@ Expected blueprint addition:
     "model_path": "ml/saved_model.pkl",
     "technique_used": "RandomForestClassifier for Supervised_ML",
     "expected_input_features": ["cqi", "buffer_occupancy"],
-    "best_metric_name": "accuracy | f1 | anomaly_f1 | other",
+    "best_metric_name": "accuracy | f1 | f1_macro | neg_rmse | anomaly_f1 | anomaly_separation_advisory",
     "best_metric_value": 0.91,
     "threshold": 0.85,
     "threshold_met": true,
@@ -398,7 +405,7 @@ Module 5 writes the standalone decision engine used by the final xApp. It must r
 
 Main function:
 
-- `module_5_logic_dev_node(state)`: writes `logic/core_logic.py`, tests it against streaming mock data, and returns the logic artifact metadata.
+- `module_5_logic_dev_node(state)`: writes `logic/core_logic.py`, exercises it against `streaming_mock_data.json`, saves the run output to `log/module_5_logic.log`, and returns the logic artifact metadata.
 
 Generated artifacts:
 
@@ -410,11 +417,13 @@ Required class contract:
 ```python
 class XAppLogic:
     def __init__(self):
-        ...   # loads ML model if ML_Model_Artifacts present; empty for Pure_Logic
+        ...   # loads ML model only if ML_Model_Artifacts is present; empty for Pure_Logic
 
     def process_interval(self, row_dict):
         ...   # returns a dict matching one Action_Space_Menu entry
 ```
+
+The bottom of `core_logic.py` must contain an `if __name__ == '__main__':` block that loads `Data_Paths.streaming_mock_data_path` with `json.load`, instantiates `XAppLogic`, iterates through the JSON array, and calls `process_interval(item["data"])` for each entry. The prompt also enforces that the logic must trigger the expected action for at least some rows — returning `DO_NOTHING` for every row is treated as a failed implementation.
 
 `process_interval(row_dict)` must return a dictionary matching one of the actions in `Technical_Mapping.Action_Space_Menu`, for example:
 
@@ -448,30 +457,18 @@ Location: `src/module_6/integrator.py`
 
 Role: FlexRIC integrator.
 
-Module 6 injects the tested `XAppLogic` class into a FlexRIC Python SDK template. It uses semantic search with a single targeted call to resolve how to access the correct C-struct fields for the detected service model (e.g. `ind.ue_stats[0].wb_cqi` vs `ind.mac_stats[0].dl_aggr_tbs`).
+Module 6 injects the tested `XAppLogic` class into a FlexRIC Python SDK template. It uses the Semantic Search service with one targeted call per Service Model to resolve how to access the correct C-struct fields (e.g. `ind.ue_stats[0].wb_cqi` vs `ind.mac_stats[0].dl_aggr_tbs`).
 
-**Context-budget design:** Only the fields Module 6 actually needs are extracted from the full blueprint before being passed to the agent. This significantly reduces the initial prompt size compared to dumping the entire blueprint (which includes ML artifacts, data paths, synthesizer metadata, and Module 5 terminal logs that are irrelevant at this stage).
+**Context-budget design:** Only the fields Module 6 actually needs are extracted from the full blueprint before being passed to the agent. Specifically `Intent_Blueprint.{xApp_Name, goal, cycle_Type}`, `Technical_Mapping`, and `Logic_Artifacts`. `Data_Paths`, `ML_Model_Artifacts`, and Module 3–5 log content are excluded from the prompt.
 
-Fields passed to the agent:
+**Message-window trimming:** A `pre_model_hook` runs `limit_context_window(state, max_messages=14)` before each model call. If the internal message list exceeds the cap, it keeps the first message (task + context) and the most recent N − 1, dropping the middle. This prevents context-window overflow on OSS models with 128 K limits.
 
-| Blueprint field | Why included |
-|---|---|
-| `Intent_Blueprint.xApp_Name`, `.goal`, `.cycle_Type` | Orientation context |
-| `Technical_Mapping` | SM type, telemetry C-variables, action space |
-| `Logic_Artifacts` | Path to the Module 5 script |
+**Strict 4-step workflow** enforced by the system prompt:
 
-Fields excluded: `Data_Paths`, `ML_Model_Artifacts`, all synthesizer/profiler metadata, Module 3–5 log content.
-
-**Message-window trimming:** A `pre_model_hook` runs before each model call inside the ReAct loop. If the internal message list exceeds 12 entries, it keeps only the first message (the task + context) and the 10 most recent messages, dropping the middle. This caps the effective context sent to the model at roughly 10–15 K tokens regardless of how many tool-call iterations have accumulated, preventing context-window overflow on OSS models with 128 K limits.
-
-**Strict 4-step workflow:** The system prompt enforces exactly 4 tool calls in sequence, eliminating the open-ended loop that caused the agent to burn through its recursion budget:
-
-1. `semantic_search_summary` — one search call for struct field patterns
-2. `read_file flexric_template.py` — read the template once
-3. `write_file final_xapp.py` — write the completed xApp once
-4. `terminal_command "mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log"` — syntax check and log in one combined command
-
-The recursion limit default was reduced from 40 to 20, which is still ample for the 4-step workflow and prevents runaway looping.
+1. `semantic_search_summary` — one RAG call for SM callback patterns. (`semantic_search_detailed` is allowed if the summary is insufficient.) The agent reads code snippets directly from the response and is explicitly told not to call `read_file` on internal index paths.
+2. `read_file flexric_template.py` — read the template once.
+3. `write_file final_xapp.py` — write the completed xApp with all six placeholders replaced.
+4. `terminal_command "mkdir -p log && python3 -m py_compile final_xapp.py 2>&1 | tee log/module_6_integrator.log"` — syntax check and log in one combined command.
 
 **Step-limit error handling:** If the recursion limit is reached, the node detects the LangGraph `"need more steps"` message and returns a clear, actionable error (`"Set INTEGRATOR_RECURSIVE_LIMIT > N and re-run"`) instead of silently propagating the opaque message to the UI.
 
@@ -484,7 +481,7 @@ Main functions:
 Template locations:
 
 - `src/workspace/flexric_template.py`
-- `src/module_6/flexric_template.py`
+- `src/module_6/flexric_template.py` (committed master copy)
 
 Important placeholders:
 
@@ -511,55 +508,84 @@ Expected blueprint addition:
 }
 ```
 
-The module does not execute the final xApp because a live RIC/FlexRIC environment may not be available. It only performs a syntax check with:
+The module does not execute the final xApp itself — it only performs a syntax check with `python3 -m py_compile`. Live execution against the testbed is the responsibility of Module 7.
 
-```bash
-python3 -m py_compile final_xapp.py
-```
+## Module 7: Testbed Deployer
 
-## Semantic Search
+Location: `src/module_7/deployer.py`
 
-Location: `src/tools/semantic_search/`
-Tool wrappers: `src/tools/semantic_search/semantic_search_tool.py`
+Role: deployment engineer.
 
-The Semantic Search tool provides codebase exploration capabilities for the agent.
+Module 7 runs only when the user types `Proceed` at the deploy prompt. It is a deterministic node (no LLM) that orchestrates the testbed Docker stack.
 
-Start command:
+**Workflow:**
 
-```bash
-cd src/tools/semantic_search
-docker compose up -d --build
-```
+1. Copy `workspace/final_xapp.py` to `workspace/testbed/nearrtric/xapps/xapp.py`.
+2. Copy `workspace/{data, ml, logic}/` into `workspace/testbed/nearrtric/xapps/` so the running xApp container can read its model and logic at runtime.
+3. Patch `nearrtric/Dockerfile.xapp` so the entire `./xapps/` directory is copied into `/flexric/build/examples/xApp/python3/` (replaces the single-file `COPY` line if present).
+4. `docker compose down` to stop any previous run.
+5. `docker compose up -d --build` to rebuild and launch the nearrtric stack.
+6. Sleep 20 seconds while the xApp executes against the testbed.
+7. `docker logs --tail 50 xapp` to capture container output.
+8. `docker compose down` to stop the stack.
+9. Append the last 1 000 characters of logs to the conversation as a deployment summary.
 
-## Workspace Tools
+Main function:
+
+- `module_7_deployer_node(state)`: runs the steps above synchronously and returns `is_complete=True` plus an `AIMessage` summarizing the captured logs.
+
+The testbed layout (`src/workspace/testbed/`) is expected to already be present and to contain a `nearrtric/` Docker Compose stack. Module 7 does not create it from scratch.
+
+## Tooling
+
+### Semantic Search service
+
+Location: `src/tools/semantic_search`
+
+The Semantic Search service replaces the previous FlexRIC Structural RAG. It is a Docker stack consisting of:
+
+- `chroma-db` — ChromaDB vector store (host port `7000`, container port `8000`).
+- `semantic-api` — FastAPI app (host port `7080`) that on startup clones every repo listed in `repos.yml` (currently the FlexRIC `dev` branch), chunks `.c/.h/.cpp/.hpp/.py` files with LangChain's `LanguageParser` + `RecursiveCharacterTextSplitter`, embeds them with `all-MiniLM-L6-v2`, and exposes:
+  - `POST /semantic_search` — vector retrieval, optional `truncate_chars` and `return_full_text`.
+  - `POST /exact_search` — `ripgrep`-backed keyword search across cloned repos.
+  - `GET /status` — ingestion progress (cloning + embedding takes a few minutes on first start).
+
+LangChain wrappers in `src/tools/semantic_search/semantic_search_tool.py`:
+
+- `semantic_search_summary(query, n_results=5)` — primary tool used by Modules 2, 3, and 6. Returns full code snippets (`return_full_text=True`).
+- `semantic_search_detailed(query, n_results=2)` — same endpoint but reserved for digging into a specific definition.
+
+Both target `SEMANTIC_SEARCH_URL` (default `http://localhost:7080`).
+
+### OrioSearch
+
+Location: `src/tools/oriosearch`
+
+Used by Module 2 through `restricted_domain_search`. Provides web search for O-RAN concepts, restricted to domains such as `o-ran-sc.org`. Runs on port 8000.
+
+### Workspace tools
 
 Location: `src/tools/workspace/workspace_tools.py`
 
 The workspace tool layer gives ReAct modules controlled file and terminal access.
 
-Key details:
-
 - `WORKSPACE_DIR` resolves to `src/workspace` and is exported for direct use by the Module 4 fallback reporter.
-- File tools come from LangChain's `FileManagementToolkit`.
-- Available file operations include read, write, list, copy, move, and search.
-- `terminal_command(command)` executes shell commands with `cwd=src/workspace`.
-- The terminal wrapper blocks simple attempts to `cd` outside the workspace.
-- Commands time out after 120 seconds.
+- File tools come from LangChain's `FileManagementToolkit` (read, write, list, copy, move, search).
+- `terminal_command(command)` executes shell commands with `cwd=src/workspace`. The wrapper blocks simple attempts to `cd` outside the workspace and times out after 120 seconds.
 
 Modules 3, 4, 5, and 6 depend on these tools to create generated artifacts.
 
-## OrioSearch Tooling
+### Context utilities
 
-Location: `src/tools/oriosearch`
+Location: `src/tools/context_utils.py`
 
-Used by Module 2 through `restricted_domain_search`. Provides web/document search for O-RAN concepts and documentation, restricting searches to domains such as `o-ran-sc.org`.
+- `limit_tool_messages(state)` — truncates already-consumed `ToolMessage` content to `[Output truncated to maintain context window.]` and caps active tool outputs at 10 000 characters.
+- `limit_context_window(state, max_messages=14)` — sliding window that keeps the first message (system prompt or task) plus the most recent N − 1 messages. Used as a `pre_model_hook` by every ReAct agent.
 
-Run it with:
+### Convenience scripts
 
-```bash
-cd src/tools/oriosearch
-docker compose up -d
-```
+- `src/tools/start_tools.sh` — `cd` into each tool directory and run `docker compose up -d` (oriosearch and semantic_search).
+- `src/tools/stop_tools.sh` — `docker compose stop` for both stacks.
 
 ## Generated Artifacts
 
@@ -568,29 +594,29 @@ All generated files are created under `src/workspace`:
 ```text
 src/workspace
 |-- data
-|   |-- generate_data.py          # synthesizer path only
-|   |-- pre_filter.py             # profiler path only
-|   |-- profile_and_merge.py      # profiler path only
-|   |-- streaming_mock_data.csv
-|   |-- historical_training_data.csv
-|   `-- test_data.csv
+|   |-- build_streaming_datasets.py
+|   |-- pre_filter.py                  # only when profiling user paths
+|   |-- streaming_mock_data.json       # hierarchical, matches Telemetry_Variables
+|   |-- historical_training_data.csv   # ML workflows
+|   `-- test_data.csv                  # ML workflows
 |-- ml
-|   |-- train.py
+|   |-- train.py                       # pre-written wrapper around auto_train
 |   |-- saved_model.pkl
-|   `-- evaluation_report.json    # written after every training attempt; always present
+|   `-- evaluation_report.json         # always present, even on failure
 |-- logic
 |   `-- core_logic.py
 |-- log
-|   |-- module_3_data.log         # synthesizer path only
-|   |-- module_3_profiler.log     # profiler path only
+|   |-- module_3_data_engineer.log
 |   |-- module_4_ml.log
 |   |-- module_5_logic.log
 |   `-- module_6_integrator.log
+|-- testbed                            # populated by Module 7
+|   `-- nearrtric/...
 |-- flexric_template.py
 `-- final_xapp.py
 ```
 
-Not every run creates every artifact. `ml/` is skipped for `Pure_Logic` workflows. The `data/` scripts differ depending on whether the synthesizer or profiler path was taken.
+Not every run creates every artifact. `ml/` is skipped for `Pure_Logic` workflows. `data/pre_filter.py` only appears when at least one user-provided dataset path was profiled. `testbed/` is only touched if the user opted in to deployment.
 
 ## Environment Configuration
 
@@ -611,8 +637,8 @@ The graph is configured through `src/langgraph.json`:
 | Variable | Default | Description |
 |---|---|---|
 | `OLLAMA_URL` | `http://localhost:11434` | LLM inference endpoint |
-| `OLLAMA_MODEL` | `GPT-OSS-120B` | Model name |
-| `SEMANTIC_SEARCH_URL` | `http://localhost:7080` | Semantic Search API (Modules 2, 6, 3b) |
+| `OLLAMA_MODEL` | `llama3.1` | Model name |
+| `SEMANTIC_SEARCH_URL` | `http://localhost:7080` | Semantic Search API (Modules 2, 3, 6) |
 | `ORIOSEARCH_URL` | `http://localhost:8000` | Web search API (Module 2 fallback) |
 
 ### Per-module recursion limits
@@ -621,21 +647,13 @@ Each module has its own recursion limit env var. The global `RECURSIVE_LIMIT` ac
 
 | Variable | Default | Module |
 |---|---|---|
-| `MAPPER_RECURSIVE_LIMIT` | 40 | Module 2 — technical mapper |
+| `MAPPER_RECURSIVE_LIMIT` | 60 | Module 2 — technical mapper |
 | `LOGIC_RECURSIVE_LIMIT` | 40 | Module 5 — core programmer |
-| `INTEGRATOR_RECURSIVE_LIMIT` | **20** | Module 6 — xApp integrator (4-step workflow; raise only if the model needs extra repair steps) |
-| `ML_RECURSIVE_LIMIT` | **80** | Module 4 — ML developer (more steps: explore → write → run → debug → verify) |
-| `RECURSIVE_LIMIT` | 20 | Global floor used by Modules 3, 3b, and as fallback |
+| `INTEGRATOR_RECURSIVE_LIMIT` | 120 | Module 6 — xApp integrator |
+| `ML_RECURSIVE_LIMIT` | 80 | Module 4 — ML developer |
+| `RECURSIVE_LIMIT` | 40 | Global floor used by Module 3 and as fallback |
 
-### ML training variables
-
-| Variable | Default | Description |
-|---|---|---|
-| `MAX_TRAINING_ATTEMPTS` | `5` | Module 4 candidate training/evaluation retries |
-
-
-
-## Running the LangGraph Agent
+### Running the LangGraph Agent
 
 From the `src` directory:
 
@@ -648,17 +666,18 @@ A typical interaction is:
 1. User provides an xApp intent.
 2. Module 1 asks targeted questions until the blueprint is complete.
 3. User types `CONFIRM`.
-4. Module 2 runs (2 semantic search calls).
-5. The agent asks about an existing dataset; user types `no` or provides a path.
+4. Module 2 runs (semantic search calls against the FlexRIC index).
+5. The agent shows the validated telemetry schema and asks about data availability; user replies with a path, `no`, or a mix.
 6. Modules 3–6 run automatically, producing files under `src/workspace`.
+7. The agent asks whether to deploy. User types `Proceed` to launch Module 7, or anything else to stop.
 
 ## Testing
 
 `test/test_ml_contract_updates.py` contains contract tests covering:
 
 - `TestMLContractUpdates`: Module 1 acceptance criteria in decomposer prompt; Module 3 test dataset contract; Module 4 evaluation loop contract.
-- `TestModule4Reliability`: `ML_RECURSIVE_LIMIT` env var (default 80); fallback report writer; workspace artifact recovery; `WORKSPACE_DIR` import; per-attempt report writing; 5 000-row synthesizer target.
-- `TestUserDatasetFeature`: `user_dataset_path` in `AgentState`; new graph nodes and interrupt; profiler imports; system prompt content (FlexRIC-only constraint, pre-filter, column matching tiers, profiler notes); `module_3/__init__.py` export.
+- `TestModule4Reliability`: `ML_RECURSIVE_LIMIT` env var; fallback report writer; workspace artifact recovery; `WORKSPACE_DIR` import; per-attempt report writing; synthesizer row-count target.
+- `TestUserDatasetFeature`: dataset interrupt wiring; profiler imports; system prompt content (FlexRIC-only constraint, pre-filter, column matching tiers, profiler notes); Module 3 init export.
 
 Run with:
 
@@ -677,19 +696,21 @@ python -m unittest discover -s test
 The codebase follows a few important separation-of-concerns rules:
 
 - Module 1 captures intent only; it does not invent O-RAN technical details.
-- Module 2 grounds technical mappings in semantic search results; it does not hallucinate C variables.
-- Module 3 creates reproducible data for testing, using numpy vectorized generation.
-- Module 4 trains offline models only; it writes `evaluation_report.json` after every attempt so the result is always visible to the operator.
-- Module 5 writes independent decision logic with no FlexRIC dependencies.
-- Module 6 handles FlexRIC integration glue only; one semantic search call resolves struct field names.
+- Module 2 grounds technical mappings in Semantic Search results; it does not hallucinate C variables, and it produces a hierarchical schema rather than a flat list.
+- Module 3 creates reproducible, mathematically consistent data — no random noise for primary signals — and validates every additional column against the FlexRIC codebase before letting it through.
+- Module 4 runs an offline two-stage auto-training pipeline; the script is pre-written deterministically so the LLM cannot drift, and `evaluation_report.json` is always written so the result is visible to the operator.
+- Module 5 writes independent decision logic with no FlexRIC dependencies and tests against the streaming JSON before integration.
+- Module 6 handles FlexRIC integration glue only; one Semantic Search call resolves struct field names, and the workflow is hard-capped at 4 tool steps.
+- Module 7 deploys deterministically without involving the LLM, capturing real container logs as proof of execution.
 
 This division keeps the generated xApp easier to inspect, test, and debug. The final integration is only attempted after the intent, technical mappings, data, optional model, and core decision logic have been separately produced.
 
 ## Known Operational Assumptions
 
 - Ollama is expected for the main LLM calls unless environment variables point elsewhere.
-- Module 2 and Module 6 expect the Semantic Search server on `http://localhost:7080` (set `SEMANTIC_SEARCH_URL` to override).
+- Modules 2, 3, and 6 expect the Semantic Search server on `http://localhost:7080`. The first run takes several minutes while the FlexRIC repository is cloned and embedded into Chroma — `GET /status` reports progress.
 - Module 2's restricted web search expects OrioSearch on `http://localhost:8000`.
 - Generated scripts run inside `src/workspace`, so artifact paths in blueprints are relative to that directory.
-- The final xApp syntax check does not prove runtime success against a live RIC; it only verifies Python syntax after template integration.
+- Module 6's syntax check does not prove runtime success against a live RIC; it only verifies Python syntax after template integration.
 - `ml/evaluation_report.json` is always created by Module 4, even if the agent crashes, so the operator can always see whether the model met the acceptance threshold.
+- Module 7 expects a pre-existing `src/workspace/testbed/nearrtric/` Docker Compose stack with a `Dockerfile.xapp`. It does not provision this from scratch.
