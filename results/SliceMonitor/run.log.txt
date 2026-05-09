@@ -1,0 +1,10 @@
+--- Starting Slice Detail Monitor Simulation ---
+[Processor Log] Received Slice ID: 1001, Name: eMBB_Primary, UEs: 500, Type: eMBB
+[Processor Log] Received Slice ID: 1002, Name: URLLC_Critical, UEs: 15, Type: URLLC
+[Processor Log] Received Slice ID: 1001, Name: eMBB_Primary, UEs: 510, Type: eMBB
+[Processor Log] Received Slice ID: 1003, Name: mMTC_IoT, UEs: 2500, Type: mMTC
+[Processor Log] Received Slice ID: 1002, Name: URLLC_Critical, UEs: 14, Type: URLLC
+
+--- Simulation Complete ---
+Total actions processed: 5
+Example Output Action: {'action_id': 'DO_NOTHING', 'parameters': {}}

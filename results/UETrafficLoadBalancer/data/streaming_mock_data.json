@@ -1,0 +1,38 @@
+[
+    {
+        "ue_count_per_slice": 150,
+        "utilization_percentage": 45.2
+    },
+    {
+        "ue_count_per_slice": 220,
+        "utilization_percentage": 62.0
+    },
+    {
+        "ue_count_per_slice": 300,
+        "utilization_percentage": 88.5
+    },
+    {
+        "ue_count_per_slice": 310,
+        "utilization_percentage": 91.1
+    },
+    {
+        "ue_count_per_slice": 180,
+        "utilization_percentage": 55.0
+    },
+    {
+        "ue_count_per_slice": 400,
+        "utilization_percentage": 99.2
+    },
+    {
+        "ue_count_per_slice": 390,
+        "utilization_percentage": 95.0
+    },
+    {
+        "ue_count_per_slice": 250,
+        "utilization_percentage": 76.5
+    },
+    {
+        "ue_count_per_slice": 100,
+        "utilization_percentage": 30.1
+    }
+]

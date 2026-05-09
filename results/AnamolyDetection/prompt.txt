@@ -1,0 +1,2 @@
+Python3 based xApp - Observe uplink PRB usage and uplink aggregate throughput per UE via MAC SM. Use an unsupervised model to detect UEs with anomalous uplink behavior compared to the cell baseline. Flag anomalous UEs for investigation and reduce their uplink scheduling weight. Objective is to catch rogue or malfunctioning devices.
+

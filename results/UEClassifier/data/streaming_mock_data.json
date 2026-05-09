@@ -1,0 +1,212 @@
+[
+  {
+    "timestamp": 10,
+    "data": {
+      "downlink_throughput": 30489,
+      "uplink_throughput": 23035
+    }
+  },
+  {
+    "timestamp": 110,
+    "data": {
+      "downlink_throughput": 24375,
+      "uplink_throughput": 18248
+    }
+  },
+  {
+    "timestamp": 210,
+    "data": {
+      "downlink_throughput": 25901,
+      "uplink_throughput": 20938
+    }
+  },
+  {
+    "timestamp": 310,
+    "data": {
+      "downlink_throughput": 29393,
+      "uplink_throughput": 21321
+    }
+  },
+  {
+    "timestamp": 410,
+    "data": {
+      "downlink_throughput": 29255,
+      "uplink_throughput": 22344
+    }
+  },
+  {
+    "timestamp": 510,
+    "data": {
+      "downlink_throughput": 30529,
+      "uplink_throughput": 22536
+    }
+  },
+  {
+    "timestamp": 610,
+    "data": {
+      "downlink_throughput": 29274,
+      "uplink_throughput": 21362
+    }
+  },
+  {
+    "timestamp": 710,
+    "data": {
+      "downlink_throughput": 30423,
+      "uplink_throughput": 21101
+    }
+  },
+  {
+    "timestamp": 810,
+    "data": {
+      "downlink_throughput": 25901,
+      "uplink_throughput": 19214
+    }
+  },
+  {
+    "timestamp": 910,
+    "data": {
+      "downlink_throughput": 27336,
+      "uplink_throughput": 20007
+    }
+  },
+  {
+    "timestamp": 1010,
+    "data": {
+      "downlink_throughput": 26008,
+      "uplink_throughput": 19910
+    }
+  },
+  {
+    "timestamp": 1110,
+    "data": {
+      "downlink_throughput": 25888,
+      "uplink_throughput": 20286
+    }
+  },
+  {
+    "timestamp": 1210,
+    "data": {
+      "downlink_throughput": 26315,
+      "uplink_throughput": 18867
+    }
+  },
+  {
+    "timestamp": 1310,
+    "data": {
+      "downlink_throughput": 25920,
+      "uplink_throughput": 19529
+    }
+  },
+  {
+    "timestamp": 1410,
+    "data": {
+      "downlink_throughput": 24180,
+      "uplink_throughput": 18504
+    }
+  },
+  {
+    "timestamp": 1510,
+    "data": {
+      "downlink_throughput": 23535,
+      "uplink_throughput": 16116
+    }
+  },
+  {
+    "timestamp": 1610,
+    "data": {
+      "downlink_throughput": 21278,
+      "uplink_throughput": 15848
+    }
+  },
+  {
+    "timestamp": 1710,
+    "data": {
+      "downlink_throughput": 18243,
+      "uplink_throughput": 13682
+    }
+  },
+  {
+    "timestamp": 1810,
+    "data": {
+      "downlink_throughput": 14876,
+      "uplink_throughput": 11308
+    }
+  },
+  {
+    "timestamp": 1910,
+    "data": {
+      "downlink_throughput": 11570,
+      "uplink_throughput": 9350
+    }
+  },
+  {
+    "timestamp": 2010,
+    "data": {
+      "downlink_throughput": 10760,
+      "uplink_throughput": 8178
+    }
+  },
+  {
+    "timestamp": 2110,
+    "data": {
+      "downlink_throughput": 9289,
+      "uplink_throughput": 7519
+    }
+  },
+  {
+    "timestamp": 2210,
+    "data": {
+      "downlink_throughput": 9038,
+      "uplink_throughput": 6600
+    }
+  },
+  {
+    "timestamp": 2310,
+    "data": {
+      "downlink_throughput": 8991,
+      "uplink_throughput": 6757
+    }
+  },
+  {
+    "timestamp": 2410,
+    "data": {
+      "downlink_throughput": 9886,
+      "uplink_throughput": 7662
+    }
+  },
+  {
+    "timestamp": 2510,
+    "data": {
+      "downlink_throughput": 11215,
+      "uplink_throughput": 7979
+    }
+  },
+  {
+    "timestamp": 2610,
+    "data": {
+      "downlink_throughput": 13167,
+      "uplink_throughput": 9850
+    }
+  },
+  {
+    "timestamp": 2710,
+    "data": {
+      "downlink_throughput": 13548,
+      "uplink_throughput": 10692
+    }
+  },
+  {
+    "timestamp": 2810,
+    "data": {
+      "downlink_throughput": 15119,
+      "uplink_throughput": 12391
+    }
+  },
+  {
+    "timestamp": 2910,
+    "data": {
+      "downlink_throughput": 18378,
+      "uplink_throughput": 12486
+    }
+  }
+]

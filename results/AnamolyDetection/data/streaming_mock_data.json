@@ -1,0 +1,2102 @@
+[
+  {
+    "timestamp": 1777929148,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 71.34
+    }
+  },
+  {
+    "timestamp": 1777929149,
+    "data": {
+      "uplink_prb_usage": 25,
+      "uplink_throughput": 69.81
+    }
+  },
+  {
+    "timestamp": 1777929150,
+    "data": {
+      "uplink_prb_usage": 25,
+      "uplink_throughput": 73.11
+    }
+  },
+  {
+    "timestamp": 1777929151,
+    "data": {
+      "uplink_prb_usage": 25,
+      "uplink_throughput": 70.97
+    }
+  },
+  {
+    "timestamp": 1777929152,
+    "data": {
+      "uplink_prb_usage": 25,
+      "uplink_throughput": 67.99
+    }
+  },
+  {
+    "timestamp": 1777929153,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 69.17
+    }
+  },
+  {
+    "timestamp": 1777929154,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 72.44
+    }
+  },
+  {
+    "timestamp": 1777929155,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 73.3
+    }
+  },
+  {
+    "timestamp": 1777929156,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 72.12
+    }
+  },
+  {
+    "timestamp": 1777929157,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 75.35
+    }
+  },
+  {
+    "timestamp": 1777929158,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 74.72
+    }
+  },
+  {
+    "timestamp": 1777929159,
+    "data": {
+      "uplink_prb_usage": 27,
+      "uplink_throughput": 72.66
+    }
+  },
+  {
+    "timestamp": 1777929160,
+    "data": {
+      "uplink_prb_usage": 26,
+      "uplink_throughput": 68.79
+    }
+  },
+  {
+    "timestamp": 1777929161,
+    "data": {
+      "uplink_prb_usage": 27,
+      "uplink_throughput": 68.46
+    }
+  },
+  {
+    "timestamp": 1777929162,
+    "data": {
+      "uplink_prb_usage": 27,
+      "uplink_throughput": 70.67
+    }
+  },
+  {
+    "timestamp": 1777929163,
+    "data": {
+      "uplink_prb_usage": 27,
+      "uplink_throughput": 73.41
+    }
+  },
+  {
+    "timestamp": 1777929164,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 76.78
+    }
+  },
+  {
+    "timestamp": 1777929165,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 73.4
+    }
+  },
+  {
+    "timestamp": 1777929166,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 75.2
+    }
+  },
+  {
+    "timestamp": 1777929167,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 5.47
+    }
+  },
+  {
+    "timestamp": 1777929168,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 73.89
+    }
+  },
+  {
+    "timestamp": 1777929169,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 75.18
+    }
+  },
+  {
+    "timestamp": 1777929170,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 68.45
+    }
+  },
+  {
+    "timestamp": 1777929171,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 73.01
+    }
+  },
+  {
+    "timestamp": 1777929172,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 7.9
+    }
+  },
+  {
+    "timestamp": 1777929173,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 10.41
+    }
+  },
+  {
+    "timestamp": 1777929174,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 71.93
+    }
+  },
+  {
+    "timestamp": 1777929175,
+    "data": {
+      "uplink_prb_usage": 32,
+      "uplink_throughput": 69.77
+    }
+  },
+  {
+    "timestamp": 1777929176,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 73.92
+    }
+  },
+  {
+    "timestamp": 1777929177,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 8.08
+    }
+  },
+  {
+    "timestamp": 1777929178,
+    "data": {
+      "uplink_prb_usage": 100,
+      "uplink_throughput": 6.81
+    }
+  },
+  {
+    "timestamp": 1777929179,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 10.71
+    }
+  },
+  {
+    "timestamp": 1777929180,
+    "data": {
+      "uplink_prb_usage": 32,
+      "uplink_throughput": 76.82
+    }
+  },
+  {
+    "timestamp": 1777929181,
+    "data": {
+      "uplink_prb_usage": 32,
+      "uplink_throughput": 77.21
+    }
+  },
+  {
+    "timestamp": 1777929182,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 70.75
+    }
+  },
+  {
+    "timestamp": 1777929183,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 8.72
+    }
+  },
+  {
+    "timestamp": 1777929184,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 75.67
+    }
+  },
+  {
+    "timestamp": 1777929185,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 12.12
+    }
+  },
+  {
+    "timestamp": 1777929186,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 77.57
+    }
+  },
+  {
+    "timestamp": 1777929187,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 77.53
+    }
+  },
+  {
+    "timestamp": 1777929188,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 75.48
+    }
+  },
+  {
+    "timestamp": 1777929189,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 75.61
+    }
+  },
+  {
+    "timestamp": 1777929190,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 74.65
+    }
+  },
+  {
+    "timestamp": 1777929191,
+    "data": {
+      "uplink_prb_usage": 34,
+      "uplink_throughput": 79.04
+    }
+  },
+  {
+    "timestamp": 1777929192,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 5.6
+    }
+  },
+  {
+    "timestamp": 1777929193,
+    "data": {
+      "uplink_prb_usage": 35,
+      "uplink_throughput": 80.04
+    }
+  },
+  {
+    "timestamp": 1777929194,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 9.96
+    }
+  },
+  {
+    "timestamp": 1777929195,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 78.69
+    }
+  },
+  {
+    "timestamp": 1777929196,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 9.28
+    }
+  },
+  {
+    "timestamp": 1777929197,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 75.55
+    }
+  },
+  {
+    "timestamp": 1777929198,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 78.05
+    }
+  },
+  {
+    "timestamp": 1777929199,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 79.61
+    }
+  },
+  {
+    "timestamp": 1777929200,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 75.51
+    }
+  },
+  {
+    "timestamp": 1777929201,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 79.93
+    }
+  },
+  {
+    "timestamp": 1777929202,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 82.62
+    }
+  },
+  {
+    "timestamp": 1777929203,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 82.56
+    }
+  },
+  {
+    "timestamp": 1777929204,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 79.21
+    }
+  },
+  {
+    "timestamp": 1777929205,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 81.31
+    }
+  },
+  {
+    "timestamp": 1777929206,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 79.87
+    }
+  },
+  {
+    "timestamp": 1777929207,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 82.36
+    }
+  },
+  {
+    "timestamp": 1777929208,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 84.9
+    }
+  },
+  {
+    "timestamp": 1777929209,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 83.52
+    }
+  },
+  {
+    "timestamp": 1777929210,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 82.45
+    }
+  },
+  {
+    "timestamp": 1777929211,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 9.66
+    }
+  },
+  {
+    "timestamp": 1777929212,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 83.0
+    }
+  },
+  {
+    "timestamp": 1777929213,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 77.95
+    }
+  },
+  {
+    "timestamp": 1777929214,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 81.39
+    }
+  },
+  {
+    "timestamp": 1777929215,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 83.4
+    }
+  },
+  {
+    "timestamp": 1777929216,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 83.78
+    }
+  },
+  {
+    "timestamp": 1777929217,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 84.41
+    }
+  },
+  {
+    "timestamp": 1777929218,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 84.31
+    }
+  },
+  {
+    "timestamp": 1777929219,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.13
+    }
+  },
+  {
+    "timestamp": 1777929220,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 84.89
+    }
+  },
+  {
+    "timestamp": 1777929221,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 81.31
+    }
+  },
+  {
+    "timestamp": 1777929222,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 80.77
+    }
+  },
+  {
+    "timestamp": 1777929223,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.75
+    }
+  },
+  {
+    "timestamp": 1777929224,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 84.02
+    }
+  },
+  {
+    "timestamp": 1777929225,
+    "data": {
+      "uplink_prb_usage": 98,
+      "uplink_throughput": 8.62
+    }
+  },
+  {
+    "timestamp": 1777929226,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 85.49
+    }
+  },
+  {
+    "timestamp": 1777929227,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 87.05
+    }
+  },
+  {
+    "timestamp": 1777929228,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 85.01
+    }
+  },
+  {
+    "timestamp": 1777929229,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 90.9
+    }
+  },
+  {
+    "timestamp": 1777929230,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 83.56
+    }
+  },
+  {
+    "timestamp": 1777929231,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 84.33
+    }
+  },
+  {
+    "timestamp": 1777929232,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 84.25
+    }
+  },
+  {
+    "timestamp": 1777929233,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 85.82
+    }
+  },
+  {
+    "timestamp": 1777929234,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 85.21
+    }
+  },
+  {
+    "timestamp": 1777929235,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 83.42
+    }
+  },
+  {
+    "timestamp": 1777929236,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 85.49
+    }
+  },
+  {
+    "timestamp": 1777929237,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 85.77
+    }
+  },
+  {
+    "timestamp": 1777929238,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 89.75
+    }
+  },
+  {
+    "timestamp": 1777929239,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 91.29
+    }
+  },
+  {
+    "timestamp": 1777929240,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 89.21
+    }
+  },
+  {
+    "timestamp": 1777929241,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 84.14
+    }
+  },
+  {
+    "timestamp": 1777929242,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 85.13
+    }
+  },
+  {
+    "timestamp": 1777929243,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 86.42
+    }
+  },
+  {
+    "timestamp": 1777929244,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 91.08
+    }
+  },
+  {
+    "timestamp": 1777929245,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 86.4
+    }
+  },
+  {
+    "timestamp": 1777929246,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 84.41
+    }
+  },
+  {
+    "timestamp": 1777929247,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 86.4
+    }
+  },
+  {
+    "timestamp": 1777929248,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 88.62
+    }
+  },
+  {
+    "timestamp": 1777929249,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 88.46
+    }
+  },
+  {
+    "timestamp": 1777929250,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 86.32
+    }
+  },
+  {
+    "timestamp": 1777929251,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 88.44
+    }
+  },
+  {
+    "timestamp": 1777929252,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 81.34
+    }
+  },
+  {
+    "timestamp": 1777929253,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 87.05
+    }
+  },
+  {
+    "timestamp": 1777929254,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 88.87
+    }
+  },
+  {
+    "timestamp": 1777929255,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 85.6
+    }
+  },
+  {
+    "timestamp": 1777929256,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 85.59
+    }
+  },
+  {
+    "timestamp": 1777929257,
+    "data": {
+      "uplink_prb_usage": 96,
+      "uplink_throughput": 12.94
+    }
+  },
+  {
+    "timestamp": 1777929258,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 91.42
+    }
+  },
+  {
+    "timestamp": 1777929259,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.67
+    }
+  },
+  {
+    "timestamp": 1777929260,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 88.18
+    }
+  },
+  {
+    "timestamp": 1777929261,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 89.85
+    }
+  },
+  {
+    "timestamp": 1777929262,
+    "data": {
+      "uplink_prb_usage": 100,
+      "uplink_throughput": 12.8
+    }
+  },
+  {
+    "timestamp": 1777929263,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 88.03
+    }
+  },
+  {
+    "timestamp": 1777929264,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.11
+    }
+  },
+  {
+    "timestamp": 1777929265,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 88.82
+    }
+  },
+  {
+    "timestamp": 1777929266,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 91.48
+    }
+  },
+  {
+    "timestamp": 1777929267,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.99
+    }
+  },
+  {
+    "timestamp": 1777929268,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.11
+    }
+  },
+  {
+    "timestamp": 1777929269,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 84.7
+    }
+  },
+  {
+    "timestamp": 1777929270,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 85.47
+    }
+  },
+  {
+    "timestamp": 1777929271,
+    "data": {
+      "uplink_prb_usage": 95,
+      "uplink_throughput": 10.74
+    }
+  },
+  {
+    "timestamp": 1777929272,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.63
+    }
+  },
+  {
+    "timestamp": 1777929273,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.94
+    }
+  },
+  {
+    "timestamp": 1777929274,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.68
+    }
+  },
+  {
+    "timestamp": 1777929275,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 89.4
+    }
+  },
+  {
+    "timestamp": 1777929276,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 88.63
+    }
+  },
+  {
+    "timestamp": 1777929277,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 88.54
+    }
+  },
+  {
+    "timestamp": 1777929278,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 93.24
+    }
+  },
+  {
+    "timestamp": 1777929279,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 93.69
+    }
+  },
+  {
+    "timestamp": 1777929280,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 85.34
+    }
+  },
+  {
+    "timestamp": 1777929281,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 90.79
+    }
+  },
+  {
+    "timestamp": 1777929282,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 87.34
+    }
+  },
+  {
+    "timestamp": 1777929283,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 89.4
+    }
+  },
+  {
+    "timestamp": 1777929284,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 89.94
+    }
+  },
+  {
+    "timestamp": 1777929285,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 88.69
+    }
+  },
+  {
+    "timestamp": 1777929286,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 89.75
+    }
+  },
+  {
+    "timestamp": 1777929287,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 90.82
+    }
+  },
+  {
+    "timestamp": 1777929288,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 89.91
+    }
+  },
+  {
+    "timestamp": 1777929289,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.85
+    }
+  },
+  {
+    "timestamp": 1777929290,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 86.89
+    }
+  },
+  {
+    "timestamp": 1777929291,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 85.74
+    }
+  },
+  {
+    "timestamp": 1777929292,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 87.15
+    }
+  },
+  {
+    "timestamp": 1777929293,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 93.91
+    }
+  },
+  {
+    "timestamp": 1777929294,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 88.1
+    }
+  },
+  {
+    "timestamp": 1777929295,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 87.14
+    }
+  },
+  {
+    "timestamp": 1777929296,
+    "data": {
+      "uplink_prb_usage": 50,
+      "uplink_throughput": 90.77
+    }
+  },
+  {
+    "timestamp": 1777929297,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 88.94
+    }
+  },
+  {
+    "timestamp": 1777929298,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.93
+    }
+  },
+  {
+    "timestamp": 1777929299,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 91.78
+    }
+  },
+  {
+    "timestamp": 1777929300,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 89.72
+    }
+  },
+  {
+    "timestamp": 1777929301,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.13
+    }
+  },
+  {
+    "timestamp": 1777929302,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.38
+    }
+  },
+  {
+    "timestamp": 1777929303,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.19
+    }
+  },
+  {
+    "timestamp": 1777929304,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 90.5
+    }
+  },
+  {
+    "timestamp": 1777929305,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.66
+    }
+  },
+  {
+    "timestamp": 1777929306,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 83.3
+    }
+  },
+  {
+    "timestamp": 1777929307,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 87.48
+    }
+  },
+  {
+    "timestamp": 1777929308,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 83.91
+    }
+  },
+  {
+    "timestamp": 1777929309,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 92.84
+    }
+  },
+  {
+    "timestamp": 1777929310,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 85.28
+    }
+  },
+  {
+    "timestamp": 1777929311,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 87.21
+    }
+  },
+  {
+    "timestamp": 1777929312,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 89.02
+    }
+  },
+  {
+    "timestamp": 1777929313,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 9.95
+    }
+  },
+  {
+    "timestamp": 1777929314,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 87.7
+    }
+  },
+  {
+    "timestamp": 1777929315,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 89.41
+    }
+  },
+  {
+    "timestamp": 1777929316,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 92.06
+    }
+  },
+  {
+    "timestamp": 1777929317,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 90.24
+    }
+  },
+  {
+    "timestamp": 1777929318,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 92.75
+    }
+  },
+  {
+    "timestamp": 1777929319,
+    "data": {
+      "uplink_prb_usage": 49,
+      "uplink_throughput": 86.69
+    }
+  },
+  {
+    "timestamp": 1777929320,
+    "data": {
+      "uplink_prb_usage": 48,
+      "uplink_throughput": 89.16
+    }
+  },
+  {
+    "timestamp": 1777929321,
+    "data": {
+      "uplink_prb_usage": 47,
+      "uplink_throughput": 87.97
+    }
+  },
+  {
+    "timestamp": 1777929322,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 87.64
+    }
+  },
+  {
+    "timestamp": 1777929323,
+    "data": {
+      "uplink_prb_usage": 46,
+      "uplink_throughput": 90.1
+    }
+  },
+  {
+    "timestamp": 1777929324,
+    "data": {
+      "uplink_prb_usage": 45,
+      "uplink_throughput": 85.47
+    }
+  },
+  {
+    "timestamp": 1777929325,
+    "data": {
+      "uplink_prb_usage": 44,
+      "uplink_throughput": 84.23
+    }
+  },
+  {
+    "timestamp": 1777929326,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 85.68
+    }
+  },
+  {
+    "timestamp": 1777929327,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 80.13
+    }
+  },
+  {
+    "timestamp": 1777929328,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 83.83
+    }
+  },
+  {
+    "timestamp": 1777929329,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 84.08
+    }
+  },
+  {
+    "timestamp": 1777929330,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 82.19
+    }
+  },
+  {
+    "timestamp": 1777929331,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 86.14
+    }
+  },
+  {
+    "timestamp": 1777929332,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 81.05
+    }
+  },
+  {
+    "timestamp": 1777929333,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 84.07
+    }
+  },
+  {
+    "timestamp": 1777929334,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 85.1
+    }
+  },
+  {
+    "timestamp": 1777929335,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 12.29
+    }
+  },
+  {
+    "timestamp": 1777929336,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.57
+    }
+  },
+  {
+    "timestamp": 1777929337,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 85.85
+    }
+  },
+  {
+    "timestamp": 1777929338,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 85.28
+    }
+  },
+  {
+    "timestamp": 1777929339,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.9
+    }
+  },
+  {
+    "timestamp": 1777929340,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 80.99
+    }
+  },
+  {
+    "timestamp": 1777929341,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 80.16
+    }
+  },
+  {
+    "timestamp": 1777929342,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 84.66
+    }
+  },
+  {
+    "timestamp": 1777929343,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 83.1
+    }
+  },
+  {
+    "timestamp": 1777929344,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 85.81
+    }
+  },
+  {
+    "timestamp": 1777929345,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 85.39
+    }
+  },
+  {
+    "timestamp": 1777929346,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.16
+    }
+  },
+  {
+    "timestamp": 1777929347,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 80.02
+    }
+  },
+  {
+    "timestamp": 1777929348,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 84.03
+    }
+  },
+  {
+    "timestamp": 1777929349,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 81.16
+    }
+  },
+  {
+    "timestamp": 1777929350,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 11.09
+    }
+  },
+  {
+    "timestamp": 1777929351,
+    "data": {
+      "uplink_prb_usage": 95,
+      "uplink_throughput": 6.18
+    }
+  },
+  {
+    "timestamp": 1777929352,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.27
+    }
+  },
+  {
+    "timestamp": 1777929353,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 86.41
+    }
+  },
+  {
+    "timestamp": 1777929354,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 83.59
+    }
+  },
+  {
+    "timestamp": 1777929355,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 83.34
+    }
+  },
+  {
+    "timestamp": 1777929356,
+    "data": {
+      "uplink_prb_usage": 43,
+      "uplink_throughput": 80.74
+    }
+  },
+  {
+    "timestamp": 1777929357,
+    "data": {
+      "uplink_prb_usage": 42,
+      "uplink_throughput": 84.93
+    }
+  },
+  {
+    "timestamp": 1777929358,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 80.93
+    }
+  },
+  {
+    "timestamp": 1777929359,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 83.08
+    }
+  },
+  {
+    "timestamp": 1777929360,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 81.15
+    }
+  },
+  {
+    "timestamp": 1777929361,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 84.81
+    }
+  },
+  {
+    "timestamp": 1777929362,
+    "data": {
+      "uplink_prb_usage": 98,
+      "uplink_throughput": 6.65
+    }
+  },
+  {
+    "timestamp": 1777929363,
+    "data": {
+      "uplink_prb_usage": 41,
+      "uplink_throughput": 82.66
+    }
+  },
+  {
+    "timestamp": 1777929364,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 83.17
+    }
+  },
+  {
+    "timestamp": 1777929365,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 6.52
+    }
+  },
+  {
+    "timestamp": 1777929366,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 84.13
+    }
+  },
+  {
+    "timestamp": 1777929367,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 81.79
+    }
+  },
+  {
+    "timestamp": 1777929368,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 82.01
+    }
+  },
+  {
+    "timestamp": 1777929369,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 80.74
+    }
+  },
+  {
+    "timestamp": 1777929370,
+    "data": {
+      "uplink_prb_usage": 98,
+      "uplink_throughput": 9.22
+    }
+  },
+  {
+    "timestamp": 1777929371,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 80.67
+    }
+  },
+  {
+    "timestamp": 1777929372,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 79.35
+    }
+  },
+  {
+    "timestamp": 1777929373,
+    "data": {
+      "uplink_prb_usage": 40,
+      "uplink_throughput": 83.57
+    }
+  },
+  {
+    "timestamp": 1777929374,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 78.63
+    }
+  },
+  {
+    "timestamp": 1777929375,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 84.4
+    }
+  },
+  {
+    "timestamp": 1777929376,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 83.0
+    }
+  },
+  {
+    "timestamp": 1777929377,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 81.25
+    }
+  },
+  {
+    "timestamp": 1777929378,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 81.2
+    }
+  },
+  {
+    "timestamp": 1777929379,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 79.86
+    }
+  },
+  {
+    "timestamp": 1777929380,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 81.05
+    }
+  },
+  {
+    "timestamp": 1777929381,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 83.01
+    }
+  },
+  {
+    "timestamp": 1777929382,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 78.71
+    }
+  },
+  {
+    "timestamp": 1777929383,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 75.92
+    }
+  },
+  {
+    "timestamp": 1777929384,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 82.09
+    }
+  },
+  {
+    "timestamp": 1777929385,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 80.38
+    }
+  },
+  {
+    "timestamp": 1777929386,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 77.71
+    }
+  },
+  {
+    "timestamp": 1777929387,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 77.84
+    }
+  },
+  {
+    "timestamp": 1777929388,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 77.54
+    }
+  },
+  {
+    "timestamp": 1777929389,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 77.86
+    }
+  },
+  {
+    "timestamp": 1777929390,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 78.82
+    }
+  },
+  {
+    "timestamp": 1777929391,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 78.96
+    }
+  },
+  {
+    "timestamp": 1777929392,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 78.84
+    }
+  },
+  {
+    "timestamp": 1777929393,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 79.38
+    }
+  },
+  {
+    "timestamp": 1777929394,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 80.65
+    }
+  },
+  {
+    "timestamp": 1777929395,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 80.8
+    }
+  },
+  {
+    "timestamp": 1777929396,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 79.64
+    }
+  },
+  {
+    "timestamp": 1777929397,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 83.18
+    }
+  },
+  {
+    "timestamp": 1777929398,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 81.62
+    }
+  },
+  {
+    "timestamp": 1777929399,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 75.78
+    }
+  },
+  {
+    "timestamp": 1777929400,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 81.66
+    }
+  },
+  {
+    "timestamp": 1777929401,
+    "data": {
+      "uplink_prb_usage": 39,
+      "uplink_throughput": 82.65
+    }
+  },
+  {
+    "timestamp": 1777929402,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 79.36
+    }
+  },
+  {
+    "timestamp": 1777929403,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 76.01
+    }
+  },
+  {
+    "timestamp": 1777929404,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 79.62
+    }
+  },
+  {
+    "timestamp": 1777929405,
+    "data": {
+      "uplink_prb_usage": 38,
+      "uplink_throughput": 80.38
+    }
+  },
+  {
+    "timestamp": 1777929406,
+    "data": {
+      "uplink_prb_usage": 37,
+      "uplink_throughput": 76.91
+    }
+  },
+  {
+    "timestamp": 1777929407,
+    "data": {
+      "uplink_prb_usage": 100,
+      "uplink_throughput": 5.78
+    }
+  },
+  {
+    "timestamp": 1777929408,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 78.59
+    }
+  },
+  {
+    "timestamp": 1777929409,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 78.24
+    }
+  },
+  {
+    "timestamp": 1777929410,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 77.8
+    }
+  },
+  {
+    "timestamp": 1777929411,
+    "data": {
+      "uplink_prb_usage": 36,
+      "uplink_throughput": 78.6
+    }
+  },
+  {
+    "timestamp": 1777929412,
+    "data": {
+      "uplink_prb_usage": 35,
+      "uplink_throughput": 75.35
+    }
+  },
+  {
+    "timestamp": 1777929413,
+    "data": {
+      "uplink_prb_usage": 34,
+      "uplink_throughput": 76.16
+    }
+  },
+  {
+    "timestamp": 1777929414,
+    "data": {
+      "uplink_prb_usage": 34,
+      "uplink_throughput": 78.48
+    }
+  },
+  {
+    "timestamp": 1777929415,
+    "data": {
+      "uplink_prb_usage": 34,
+      "uplink_throughput": 76.36
+    }
+  },
+  {
+    "timestamp": 1777929416,
+    "data": {
+      "uplink_prb_usage": 34,
+      "uplink_throughput": 73.19
+    }
+  },
+  {
+    "timestamp": 1777929417,
+    "data": {
+      "uplink_prb_usage": 33,
+      "uplink_throughput": 75.27
+    }
+  },
+  {
+    "timestamp": 1777929418,
+    "data": {
+      "uplink_prb_usage": 32,
+      "uplink_throughput": 73.03
+    }
+  },
+  {
+    "timestamp": 1777929419,
+    "data": {
+      "uplink_prb_usage": 32,
+      "uplink_throughput": 76.24
+    }
+  },
+  {
+    "timestamp": 1777929420,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 75.57
+    }
+  },
+  {
+    "timestamp": 1777929421,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 70.82
+    }
+  },
+  {
+    "timestamp": 1777929422,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 10.73
+    }
+  },
+  {
+    "timestamp": 1777929423,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 72.13
+    }
+  },
+  {
+    "timestamp": 1777929424,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 78.54
+    }
+  },
+  {
+    "timestamp": 1777929425,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 74.68
+    }
+  },
+  {
+    "timestamp": 1777929426,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 71.01
+    }
+  },
+  {
+    "timestamp": 1777929427,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 71.26
+    }
+  },
+  {
+    "timestamp": 1777929428,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 75.64
+    }
+  },
+  {
+    "timestamp": 1777929429,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 73.06
+    }
+  },
+  {
+    "timestamp": 1777929430,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 8.4
+    }
+  },
+  {
+    "timestamp": 1777929431,
+    "data": {
+      "uplink_prb_usage": 31,
+      "uplink_throughput": 78.67
+    }
+  },
+  {
+    "timestamp": 1777929432,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 72.32
+    }
+  },
+  {
+    "timestamp": 1777929433,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 74.14
+    }
+  },
+  {
+    "timestamp": 1777929434,
+    "data": {
+      "uplink_prb_usage": 30,
+      "uplink_throughput": 77.41
+    }
+  },
+  {
+    "timestamp": 1777929435,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 73.85
+    }
+  },
+  {
+    "timestamp": 1777929436,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 69.34
+    }
+  },
+  {
+    "timestamp": 1777929437,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 10.94
+    }
+  },
+  {
+    "timestamp": 1777929438,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 69.61
+    }
+  },
+  {
+    "timestamp": 1777929439,
+    "data": {
+      "uplink_prb_usage": 27,
+      "uplink_throughput": 74.98
+    }
+  },
+  {
+    "timestamp": 1777929440,
+    "data": {
+      "uplink_prb_usage": 28,
+      "uplink_throughput": 70.43
+    }
+  },
+  {
+    "timestamp": 1777929441,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 80.33
+    }
+  },
+  {
+    "timestamp": 1777929442,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 76.72
+    }
+  },
+  {
+    "timestamp": 1777929443,
+    "data": {
+      "uplink_prb_usage": 99,
+      "uplink_throughput": 12.97
+    }
+  },
+  {
+    "timestamp": 1777929444,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 73.25
+    }
+  },
+  {
+    "timestamp": 1777929445,
+    "data": {
+      "uplink_prb_usage": 29,
+      "uplink_throughput": 75.01
+    }
+  },
+  {
+    "timestamp": 1777929446,
+    "data": {
+      "uplink_prb_usage": 95,
+      "uplink_throughput": 13.4
+    }
+  },
+  {
+    "timestamp": 1777929447,
+    "data": {
+      "uplink_prb_usage": 97,
+      "uplink_throughput": 9.74
+    }
+  }
+]

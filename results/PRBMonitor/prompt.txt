@@ -1,0 +1,1 @@
+Write a Python3 based xApp, use name prbmonitor - "Monitor downlink PRB usage and aggregate throughput per UE using the MAC service model. When PRB utilization exceeds 85% for a UE, throttle its scheduling priority by reducing its PRB allocation ratio. Goal is to prevent radio resource exhaustion."

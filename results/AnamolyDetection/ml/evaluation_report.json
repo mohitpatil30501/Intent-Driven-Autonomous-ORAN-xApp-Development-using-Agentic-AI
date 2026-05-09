@@ -1,0 +1,34 @@
+{
+  "threshold": 0.85,
+  "metric_policy": "task_aware",
+  "best_metric_name": "anomaly_separation_advisory",
+  "best_metric_value": 0.6733333333333333,
+  "threshold_met": false,
+  "technique_used": "OneClassSVM for Unsupervised_ML",
+  "task_family": "unsupervised_anomaly",
+  "expected_input_features": [
+    "uplink_prb_usage",
+    "uplink_throughput"
+  ],
+  "label_column": null,
+  "best_params": null,
+  "evaluation_report_path": "ml/evaluation_report.json",
+  "attempts": [
+    {
+      "attempt": 1,
+      "stage": "spot_check",
+      "model": "IsolationForest",
+      "metric_name": "anomaly_separation_advisory",
+      "metric_value": 0.54,
+      "threshold_met": false
+    },
+    {
+      "attempt": 2,
+      "stage": "spot_check",
+      "model": "OneClassSVM",
+      "metric_name": "anomaly_separation_advisory",
+      "metric_value": 0.6733333333333333,
+      "threshold_met": false
+    }
+  ]
+}

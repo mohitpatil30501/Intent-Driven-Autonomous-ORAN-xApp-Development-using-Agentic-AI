@@ -1,0 +1,1 @@
+UE load balancer and traffic streering xapp using python3 and Slice Service Model. you can use per-ue count of slice, where if it exceeds 50 or slice utilization goes above 80%, Trigger control signals in slice service model to ensure not a single slice get overloaded. This is a puri threshold based logic (>50 UE's or Utilization > 80%).

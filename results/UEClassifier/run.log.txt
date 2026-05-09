@@ -1,0 +1,127 @@
+Initializing XAppLogic: Attempting to load ML Model...
+Successfully loaded ML model from ml/saved_model.pkl.
+
+--- Starting Stream Simulation ---
+
+[Step 1/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 2/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 3/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 4/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 5/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 6/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 7/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 8/30]: Processing input...
+--> Decision Made: UPDATE_PRB_ALLOCATION
+
+[Step 9/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 10/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 11/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 12/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 13/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 14/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 15/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 16/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 17/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 18/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 19/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 20/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 21/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 22/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 23/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 24/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 25/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 26/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 27/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 28/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 29/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+[Step 30/30]: Processing input...
+--> Decision Made: DO_NOTHING
+
+--- Stream Simulation Complete ---
+Final Decisions Summary:
+Time Step 1: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 1, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 2: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 3: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 4: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 4, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 5: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 5, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 6: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 6, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 7: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 7, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 8: {"action_id": "UPDATE_PRB_ALLOCATION", "parameters": {"ue_id": 8, "prb_allocation_adjustment": 0.2, "reason_code": 1}}
+Time Step 9: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 10: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 11: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 12: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 13: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 14: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 15: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 16: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 17: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 18: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 19: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 20: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 21: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 22: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 23: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 24: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 25: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 26: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 27: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 28: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 29: {"action_id": "DO_NOTHING", "parameters": {}}
+Time Step 30: {"action_id": "DO_NOTHING", "parameters": {}}

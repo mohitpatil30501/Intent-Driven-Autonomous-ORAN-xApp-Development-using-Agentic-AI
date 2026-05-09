@@ -1,0 +1,906 @@
+\n===================================================
+           STARTING CORE LOGIC EXECUTION           
+===================================================\n
+XAppLogic Initializing...
+Model loaded successfully for anomaly scoring.
+--- Processing UE 0 (PRB: 26, Thp: 71.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 25, Thp: 69.81) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 25, Thp: 73.11) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 25, Thp: 70.97) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 25, Thp: 67.99) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 69.17) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 72.44) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 73.30) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 72.12) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 75.35) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 74.72) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 27, Thp: 72.66) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 26, Thp: 68.79) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 27, Thp: 68.46) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 27, Thp: 70.67) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 27, Thp: 73.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 28, Thp: 76.78) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 28, Thp: 73.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 28, Thp: 75.20) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 5.47) ---
+-> Calculated Anomaly Score: 0.2008
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 28, Thp: 73.89) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 75.18) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 68.45) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 73.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 7.90) ---
+-> Calculated Anomaly Score: 0.0777
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 10.41) ---
+-> Calculated Anomaly Score: 0.2776
+!!! ANOMALY DETECTED: Score 0.2776!!!
+--- Processing UE 0 (PRB: 31, Thp: 71.93) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 32, Thp: 69.77) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 73.92) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 8.08) ---
+-> Calculated Anomaly Score: 0.1001
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 100, Thp: 6.81) ---
+-> Calculated Anomaly Score: 0.2327
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 10.71) ---
+-> Calculated Anomaly Score: 0.1240
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 32, Thp: 76.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 32, Thp: 77.21) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 70.75) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 8.72) ---
+-> Calculated Anomaly Score: 0.1310
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 75.67) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 12.12) ---
+-> Calculated Anomaly Score: 0.1945
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 77.57) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 77.53) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 75.48) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 75.61) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 74.65) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 34, Thp: 79.04) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 5.60) ---
+-> Calculated Anomaly Score: 0.1777
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 35, Thp: 80.04) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 9.96) ---
+-> Calculated Anomaly Score: 0.1801
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 78.69) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 9.28) ---
+-> Calculated Anomaly Score: 0.0922
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 75.55) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 78.05) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 79.61) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 75.51) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 79.93) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 82.62) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 82.56) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 79.21) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 81.31) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 79.87) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 82.36) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 84.90) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 83.52) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 82.45) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 9.66) ---
+-> Calculated Anomaly Score: 0.1678
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 83.00) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 77.95) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 81.39) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 83.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 83.78) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 84.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 84.31) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 84.89) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 81.31) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 80.77) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.75) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 84.02) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 98, Thp: 8.62) ---
+-> Calculated Anomaly Score: 0.1436
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 85.49) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 87.05) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 85.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 90.90) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 83.56) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 84.33) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 84.25) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 85.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 85.21) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 83.42) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 85.49) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 85.77) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 89.75) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 91.29) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 89.21) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 84.14) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 85.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 86.42) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 91.08) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 86.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 84.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 86.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 88.62) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 88.46) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 86.32) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 88.44) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 81.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 87.05) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 88.87) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 85.60) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 85.59) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 96, Thp: 12.94) ---
+-> Calculated Anomaly Score: 0.2462
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 91.42) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.67) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 88.18) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 89.85) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 100, Thp: 12.80) ---
+-> Calculated Anomaly Score: 0.2654
+!!! ANOMALY DETECTED: Score 0.2654!!!
+--- Processing UE 0 (PRB: 48, Thp: 88.03) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.11) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 88.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 91.48) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.99) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.11) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 84.70) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 85.47) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 95, Thp: 10.74) ---
+-> Calculated Anomaly Score: 0.1588
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.63) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.94) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.68) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 89.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 88.63) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 88.54) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 93.24) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 93.69) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 85.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 90.79) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 87.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 89.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 89.94) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 88.69) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 89.75) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 90.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 89.91) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.85) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 86.89) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 85.74) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 87.15) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 93.91) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 88.10) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 87.14) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 50, Thp: 90.77) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 88.94) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.93) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 91.78) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 89.72) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.38) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.19) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 90.50) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 87.66) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 83.30) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 87.48) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 83.91) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 92.84) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 85.28) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 87.21) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 89.02) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 9.95) ---
+-> Calculated Anomaly Score: 0.2562
+!!! ANOMALY DETECTED: Score 0.2562!!!
+--- Processing UE 0 (PRB: 48, Thp: 87.70) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 89.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 92.06) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 90.24) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 92.75) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 49, Thp: 86.69) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 48, Thp: 89.16) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 47, Thp: 87.97) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 87.64) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 46, Thp: 90.10) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 45, Thp: 85.47) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 44, Thp: 84.23) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 85.68) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 80.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 83.83) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 84.08) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 82.19) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 86.14) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 81.05) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 84.07) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 85.10) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 12.29) ---
+-> Calculated Anomaly Score: 0.1821
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.57) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 85.85) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 85.28) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.90) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 80.99) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 80.16) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 84.66) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 83.10) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 85.81) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 85.39) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.16) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 80.02) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 84.03) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 81.16) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 11.09) ---
+-> Calculated Anomaly Score: 0.1869
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 95, Thp: 6.18) ---
+-> Calculated Anomaly Score: 0.2044
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.27) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 86.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 83.59) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 83.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 43, Thp: 80.74) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 42, Thp: 84.93) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 80.93) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 83.08) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 81.15) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 84.81) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 98, Thp: 6.65) ---
+-> Calculated Anomaly Score: 0.0606
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 41, Thp: 82.66) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 83.17) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 6.52) ---
+-> Calculated Anomaly Score: 0.1302
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 84.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 81.79) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 82.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 80.74) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 98, Thp: 9.22) ---
+-> Calculated Anomaly Score: 0.2409
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 80.67) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 79.35) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 40, Thp: 83.57) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 78.63) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 84.40) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 83.00) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 81.25) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 81.20) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 79.86) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 81.05) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 83.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 78.71) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 75.92) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 82.09) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 80.38) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 77.71) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 77.84) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 77.54) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 77.86) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 78.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 78.96) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 78.84) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 79.38) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 80.65) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 80.80) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 79.64) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 83.18) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 81.62) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 75.78) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 81.66) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 39, Thp: 82.65) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 79.36) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 76.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 79.62) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 38, Thp: 80.38) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 37, Thp: 76.91) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 100, Thp: 5.78) ---
+-> Calculated Anomaly Score: 0.2111
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 78.59) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 78.24) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 77.80) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 36, Thp: 78.60) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 35, Thp: 75.35) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 34, Thp: 76.16) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 34, Thp: 78.48) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 34, Thp: 76.36) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 34, Thp: 73.19) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 33, Thp: 75.27) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 32, Thp: 73.03) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 32, Thp: 76.24) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 75.57) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 70.82) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 10.73) ---
+-> Calculated Anomaly Score: 0.1475
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 72.13) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 78.54) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 74.68) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 71.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 71.26) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 75.64) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 73.06) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 8.40) ---
+-> Calculated Anomaly Score: 0.1224
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 31, Thp: 78.67) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 72.32) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 74.14) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 30, Thp: 77.41) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 73.85) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 69.34) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 97, Thp: 10.94) ---
+-> Calculated Anomaly Score: 0.3148
+!!! ANOMALY DETECTED: Score 0.3148!!!
+--- Processing UE 0 (PRB: 28, Thp: 69.61) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 27, Thp: 74.98) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 28, Thp: 70.43) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 80.33) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 76.72) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 99, Thp: 12.97) ---
+-> Calculated Anomaly Score: 0.3065
+!!! ANOMALY DETECTED: Score 0.3065!!!
+--- Processing UE 0 (PRB: 29, Thp: 73.25) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 29, Thp: 75.01) ---
+-> Calculated Anomaly Score: 0.0000
+-> Status: Nominal. No action required.
+--- Processing UE 0 (PRB: 95, Thp: 13.40) ---
+-> Calculated Anomaly Score: 0.3547
+!!! ANOMALY DETECTED: Score 0.3547!!!
+--- Processing UE 0 (PRB: 97, Thp: 9.74) ---
+-> Calculated Anomaly Score: 0.2690
+!!! ANOMALY DETECTED: Score 0.2690!!!
+\nSUCCESS: Core logic execution completed successfully.

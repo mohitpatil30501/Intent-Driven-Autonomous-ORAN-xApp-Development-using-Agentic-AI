@@ -1,0 +1,50 @@
+{
+  "threshold": 0.85,
+  "metric_policy": "task_aware",
+  "best_metric_name": "f1",
+  "best_metric_value": 0.9836065573770492,
+  "threshold_met": true,
+  "technique_used": "LogisticRegression for Supervised_ML",
+  "task_family": "supervised_binary",
+  "expected_input_features": [
+    "downlink_throughput",
+    "uplink_throughput"
+  ],
+  "label_column": "high_load",
+  "best_params": null,
+  "evaluation_report_path": "ml/evaluation_report.json",
+  "attempts": [
+    {
+      "attempt": 1,
+      "stage": "spot_check",
+      "model": "LogisticRegression",
+      "metric_name": "f1",
+      "metric_value": 0.9836065573770492,
+      "threshold_met": true
+    },
+    {
+      "attempt": 2,
+      "stage": "spot_check",
+      "model": "RandomForestClassifier",
+      "metric_name": "f1",
+      "metric_value": 0.951048951048951,
+      "threshold_met": true
+    },
+    {
+      "attempt": 3,
+      "stage": "spot_check",
+      "model": "GradientBoostingClassifier",
+      "metric_name": "f1",
+      "metric_value": 0.9547038327526133,
+      "threshold_met": true
+    },
+    {
+      "attempt": 4,
+      "stage": "spot_check",
+      "model": "KNeighborsClassifier",
+      "metric_name": "f1",
+      "metric_value": 0.9619377162629758,
+      "threshold_met": true
+    }
+  ]
+}

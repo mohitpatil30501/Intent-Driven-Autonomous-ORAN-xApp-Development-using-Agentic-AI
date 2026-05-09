@@ -1,0 +1,42 @@
+\n======================================================
+Starting XApp Logic Simulation: Slice Load Balancer
+======================================================\n
+--- Processing time step for Slice 100 ---
+  Metrics: UE Count=150, Utilization=45.20%
+  [INFO] Utilization within normal operational bounds. No action required.
+--- Processing time step for Slice 101 ---
+  Metrics: UE Count=220, Utilization=62.00%
+  [INFO] Utilization within normal operational bounds. No action required.
+--- Processing time step for Slice 102 ---
+  Metrics: UE Count=300, Utilization=88.50%
+  [ALERT] Utilization (88.50%) exceeds threshold (85.0%). Initiating load adjustment.
+--- Processing time step for Slice 100 ---
+  Metrics: UE Count=310, Utilization=91.10%
+  [ALERT] Utilization (91.10%) exceeds threshold (85.0%). Initiating load adjustment.
+--- Processing time step for Slice 101 ---
+  Metrics: UE Count=180, Utilization=55.00%
+  [INFO] Utilization within normal operational bounds. No action required.
+--- Processing time step for Slice 102 ---
+  Metrics: UE Count=400, Utilization=99.20%
+  [ALERT] Utilization (99.20%) exceeds threshold (85.0%). Initiating load adjustment.
+--- Processing time step for Slice 100 ---
+  Metrics: UE Count=390, Utilization=95.00%
+  [ALERT] Utilization (95.00%) exceeds threshold (85.0%). Initiating load adjustment.
+--- Processing time step for Slice 101 ---
+  Metrics: UE Count=250, Utilization=76.50%
+  [WARN] Utilization is high (76.50%). Monitoring closely.
+--- Processing time step for Slice 102 ---
+  Metrics: UE Count=100, Utilization=30.10%
+  [INFO] Utilization within normal operational bounds. No action required.
+\n======================================================
+Simulation Complete. Summary of Decisions:
+Step 1: Action Output -> {"action_id": "DO_NOTHING", "parameters": {}}
+Step 2: Action Output -> {"action_id": "DO_NOTHING", "parameters": {}}
+Step 3: Action Output -> {"action_id": "FORCE_LOAD_REBALANCE", "parameters": {"slice_id": 102}}
+Step 4: Action Output -> {"action_id": "FORCE_LOAD_REBALANCE", "parameters": {"slice_id": 100}}
+Step 5: Action Output -> {"action_id": "DO_NOTHING", "parameters": {}}
+Step 6: Action Output -> {"action_id": "FORCE_LOAD_REBALANCE", "parameters": {"slice_id": 102}}
+Step 7: Action Output -> {"action_id": "FORCE_LOAD_REBALANCE", "parameters": {"slice_id": 100}}
+Step 8: Action Output -> {"action_id": "UPDATE_LOAD_BALANCING_THRESHOLD", "parameters": {"slice_id": 101, "new_threshold_percent": 85, "rebalance_enabled": true}}
+Step 9: Action Output -> {"action_id": "DO_NOTHING", "parameters": {}}
+======================================================
